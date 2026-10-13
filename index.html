@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en-NZ">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#090909">
+<title>Studio Thirty Papamoa | Coach Roster</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:ital,wght@0,600;0,700;1,800&family=Inter:wght@400;600&family=Michroma&display=swap" rel="stylesheet">
+<style>
+:root{
+--black:#090909; --panel:#141414; --panel2:#1b1b1b; --line:#2a2a2a;
+--mustard:#EDB527; --cream:#E9E4D8; --muted:#8d887c; --dim:#5b574f;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{background:var(--black)}
+body{background:var(--black);color:var(--cream);font-family:'Inter',system-ui,sans-serif;font-size:15px;line-height:1.4;
+padding-inline:16px;padding-block:0 40px;-webkit-text-size-adjust:100%;min-height:100vh;
+background-image:radial-gradient(circle at 50% -10%,#1d1a12 0,#090909 520px)}
+.wrap{max-width:1280px;margin:0 auto}
+/* header */
+header{display:flex;align-items:center;gap:20px;padding:34px 0 22px;flex-wrap:wrap}
+.chev{width:54px;height:auto;flex:none}
+.stack{font-family:'Anton',Impact,sans-serif;text-transform:uppercase;line-height:.92;letter-spacing:1px}
+.stack .s{display:block;font-size:clamp(40px,8vw,76px);color:var(--cream)}
+.stack .o{display:block;font-size:clamp(40px,8vw,76px);color:transparent;-webkit-text-stroke:2px var(--cream)}
+.sub{font-family:'Michroma',sans-serif;font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--mustard);margin-top:10px}
+.band{background:var(--mustard);color:var(--black);font-family:'Michroma',sans-serif;font-size:11px;letter-spacing:.35em;text-transform:uppercase;
+overflow:hidden;white-space:nowrap;padding:8px 0;margin-inline:-16px}
+.band span{display:inline-block;padding-left:0}
+/* controls */
+.controls{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:center;padding:20px 0 6px}
+.controls label{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;letter-spacing:.16em;text-transform:uppercase;color:var(--mustard)}
+select{background:var(--panel2);color:var(--cream);border:2px solid var(--mustard);border-radius:0;padding:9px 34px 9px 12px;
+font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:19px;letter-spacing:.06em;text-transform:uppercase;min-width:190px;
+appearance:none;background-image:linear-gradient(45deg,transparent 50%,var(--mustard) 50%),linear-gradient(135deg,var(--mustard) 50%,transparent 50%);
+background-position:calc(100% - 18px) 50%,calc(100% - 12px) 50%;background-size:6px 6px;background-repeat:no-repeat}
+.chk{display:inline-flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
+.chk input{accent-color:var(--mustard);width:18px;height:18px}
+.mine{font-family:'Barlow Condensed',sans-serif;font-weight:600;font-size:17px;color:var(--cream);letter-spacing:.04em}
+.mine b{color:var(--mustard);font-size:22px}
+/* week */
+.week{margin-top:34px}
+.wh{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:14px;border-bottom:2px solid var(--line);padding-bottom:10px}
+.wh h2{font-family:'Anton',sans-serif;font-weight:400;font-size:clamp(26px,5vw,40px);letter-spacing:1px;text-transform:uppercase;color:var(--cream)}
+.wh h2 em{font-style:normal;color:transparent;-webkit-text-stroke:1.5px var(--cream)}
+.tag{font-family:'Michroma',sans-serif;font-size:10px;letter-spacing:.22em;text-transform:uppercase;padding:6px 10px;background:var(--mustard);color:var(--black)}
+.tag.alt{background:transparent;color:var(--mustard);border:1.5px solid var(--mustard)}
+.days{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:10px}
+.day{background:var(--panel);border:1px solid var(--line);display:flex;flex-direction:column;min-width:0}
+.day.today{border:2px solid var(--mustard);box-shadow:0 0 0 3px rgba(237,181,39,.15)}
+.day.past{opacity:.45}
+.dh{background:var(--cream);color:var(--black);padding:9px 12px 8px;display:flex;justify-content:space-between;align-items:flex-start;gap:6px}
+.today .dh{background:var(--mustard)}
+.dn{font-family:'Anton',sans-serif;font-size:24px;line-height:1;letter-spacing:.5px}
+.dn small{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;letter-spacing:.1em;margin-left:5px}
+.dt{font-family:'Barlow Condensed',sans-serif;font-style:italic;font-weight:800;font-size:13px;letter-spacing:.14em;text-transform:uppercase;text-align:right;line-height:1.1;padding-top:2px}
+.todaytag{background:var(--black);color:var(--mustard);font-family:'Michroma',sans-serif;font-size:8px;letter-spacing:.2em;padding:3px 6px;display:inline-block;margin-top:5px}
+.rows{display:flex;flex-direction:column}
+.r{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 12px;border-top:1px solid var(--line);min-height:44px}
+.r:first-child{border-top:0}
+.tm{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:19px;letter-spacing:.04em;color:var(--mustard);white-space:nowrap}
+.kid{font-family:'Michroma',sans-serif;font-size:8px;letter-spacing:.14em;background:var(--mustard);color:var(--black);padding:2px 5px;margin-left:6px;vertical-align:2px}
+.nm{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:19px;letter-spacing:.04em;text-transform:uppercase;text-align:right;min-width:0;overflow-wrap:anywhere}
+.nm.tbc{color:var(--muted);font-style:italic}
+.r.me{background:var(--mustard)}
+.r.me .tm,.r.me .nm{color:var(--black)}
+.r.me .kid{background:var(--black);color:var(--mustard)}
+.none{padding:18px 12px;color:var(--dim);font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:15px}
+.hol{padding:16px 12px;background:repeating-linear-gradient(135deg,#1b1b1b 0 10px,#141414 10px 20px);color:var(--mustard);font-family:'Anton',sans-serif;font-size:19px;letter-spacing:1px;text-transform:uppercase;line-height:1.15}
+.hol small{display:block;font-family:'Michroma',sans-serif;font-size:9px;letter-spacing:.2em;color:var(--muted);margin-top:6px}
+.msg{padding:50px 0;text-align:center;font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-size:20px}
+footer{margin-top:44px;padding-top:20px;border-top:2px solid var(--line);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;
+font-family:'Michroma',sans-serif;font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+footer a{color:var(--mustard);text-decoration:none;border-bottom:1px solid var(--mustard)}
+@media (max-width:520px){ .chev{width:40px} header{gap:14px} select{min-width:0;width:100%} .controls>div{width:100%} }
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<svg class="chev" viewBox="0 0 420 540" aria-hidden="true"><path d="M0,0 L170,0 L420,270 L170,540 L0,540 L250,270 Z" fill="#EDB527"/></svg>
+<div>
+<div class="stack"><span class="s">Coach Roster</span><span class="o">Next 3 Weeks</span></div>
+<div class="sub">Studio Thirty &nbsp;&bull;&nbsp; Papamoa</div>
+</div>
+</header>
+<div class="band"><span>WORK HARD &nbsp;&nbsp;&nbsp; PLAY HARD &nbsp;&nbsp;&nbsp; WORK HARD &nbsp;&nbsp;&nbsp; PLAY HARD &nbsp;&nbsp;&nbsp; WORK HARD &nbsp;&nbsp;&nbsp; PLAY HARD &nbsp;&nbsp;&nbsp; WORK HARD &nbsp;&nbsp;&nbsp; PLAY HARD</span></div>
+<div class="controls">
+<div style="display:flex;flex-direction:column;gap:6px">
+<label for="who">I'm coach</label>
+<select id="who"><option value="">Everyone</option></select>
+</div>
+<label class="chk" id="onlyWrap" hidden><input type="checkbox" id="only"><span class="mine">Show only my classes</span></label>
+<div class="mine" id="mine"></div>
+</div>
+<main id="out"><div class="msg">Loading roster...</div></main>
+<footer>
+<span id="stamp">Live from the roster sheet</span>
+<span>Studio Thirty Papamoa</span>
+</footer>
+</div>
+<script>
+(function(){
+var SHEET='1JVCmSv-PZV6_xcdvxiri5eH5lNe6EoB_MKBkPZnsaxs';
+var TABS=['October','November','December','January'];
+var MONTHS=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+var DAYN=['MON','TUE','WED','THU','FRI','SAT','SUN'];
+var weeks=[], names=[], state={who:'',only:false};
+var out=document.getElementById('out'), whoSel=document.getElementById('who');
+try{ state.who=localStorage.getItem('s30-roster-who')||''; state.only=localStorage.getItem('s30-roster-only')==='1'; }catch(e){}
+function parseCSV(t){
+var rows=[],row=[],cell='',q=false,i=0,c;
+for(;i<t.length;i++){ c=t[i];
+if(q){ if(c==='"'){ if(t[i+1]==='"'){cell+='"';i++;} else q=false; } else cell+=c; }
+else if(c==='"') q=true;
+else if(c===','){ row.push(cell); cell=''; }
+else if(c==='\n'){ row.push(cell); rows.push(row); row=[]; cell=''; }
+else if(c!=='\r') cell+=c;
+}
+if(cell!==''||row.length){ row.push(cell); rows.push(row); }
+return rows;
+}
+function nzToday(){
+var p=new Intl.DateTimeFormat('en-CA',{timeZone:'Pacific/Auckland',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date()).split('-');
+return Date.UTC(+p[0],+p[1]-1,+p[2]);
+}
+function fmtKey(ms){ return ms; }
+function parseTab(rows){
+var yr=(String(rows[0]&&rows[0][0]).match(/(20\d\d)/)||[])[1]; yr=yr?+yr:new Date().getFullYear();
+var res=[];
+for(var i=0;i<rows.length;i++){
+var a=(rows[i][0]||'').trim();
+if(!/^WEEK OF/i.test(a)) continue;
+// header row is next non-empty row with day cells
+var h=i+1; while(h<rows.length && !/MON|TUE/i.test((rows[h][1]||''))) h++;
+if(h>=rows.length) continue;
+var hdr=rows[h], days=[], prevM=-1, y=yr;
+for(var d=0;d<7;d++){
+var cellh=(hdr[d+1]||'').split('\n'), top=(cellh[0]||'').trim().toUpperCase(), type=(cellh[1]||'').trim();
+var m=top.match(/(\d{1,2})\s+([A-Z]{3})/); if(!m){ days.push(null); continue; }
+var mi=MONTHS.indexOf(m[2]); if(prevM>=0 && mi<prevM) y++; prevM=mi;
+days.push({name:DAYN[d],dnum:+m[1],mon:m[2],type:type,ms:Date.UTC(y,mi,+m[1]),slots:[]});
+}
+var r=h+1;
+while(r<rows.length){
+var lab=(rows[r][0]||'').trim();
+if(/^WEEK OF/i.test(lab)) break;
+if(lab){
+var parts=lab.split('\n'), time=parts[0].trim(), kids=/KIDS/i.test(lab);
+for(var d2=0;d2<7;d2++){
+var v=(rows[r][d2+1]||'').trim();
+if(v && days[d2]) days[d2].slots.push({time:time,kids:kids,val:v});
+}
+}
+r++;
+}
+var first=days.find(function(x){return x;});
+if(first) res.push({start:first.ms - DAYN.indexOf(first.name)*86400000, days:days.filter(Boolean), label:a});
+}
+return res;
+}
+function isHoliday(v){ return /holiday|no class/i.test(v); }
+function isTBC(v){ return /^\?+$/.test(v); }
+function tokens(v){ return v.split(/\s+or\s+|\s*\/\s*|\s*,\s*|\s*&\s*/i).map(function(s){return s.trim();}).filter(Boolean); }
+function isMine(v){ if(!state.who) return false; return tokens(v).some(function(t){return t.toLowerCase()===state.who.toLowerCase();}); }
+function esc(s){ return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
+function parseTime(t){ var m=t.match(/(\d{1,2})(?::(\d\d))?\s*(AM|PM)/i); if(!m) return 0; var h=+m[1]%12; if(/PM/i.test(m[3])) h+=12; return h*60+(+m[2]||0); }
+function pickWeeks(){
+var t=nzToday(), idx=-1;
+for(var i=0;i<weeks.length;i++){ if(t>=weeks[i].start && t<=weeks[i].start+6*86400000){ idx=i; break; } }
+if(idx<0){ idx=weeks.findIndex(function(w){return w.start>t;}); if(idx<0) idx=Math.max(0,weeks.length-3); }
+return {list:weeks.slice(idx,idx+3), idx:idx, t:t};
+}
+function render(){
+var p=pickWeeks(), t=p.t, total=0, html='';
+if(!p.list.length){ out.innerHTML='<div class="msg">No weeks on the roster yet</div>'; return; }
+p.list.forEach(function(w,wi){
+var tagTxt=wi===0?'This week':(wi===1?'Next week':'In 2 weeks');
+var first=w.days[0], last=w.days[w.days.length-1];
+html+='<section class="week"><div class="wh"><h2>Week of <em>'+first.dnum+' '+first.mon+'</em></h2><span class="tag'+(wi?' alt':'')+'">'+tagTxt+'</span></div><div class="days">';
+w.days.forEach(function(d){
+var isToday=d.ms===t, past=d.ms<t;
+var slots=d.slots.slice().sort(function(a,b){return parseTime(a.time)-parseTime(b.time);});
+var hols=slots.filter(function(s){return isHoliday(s.val);});
+var live=slots.filter(function(s){return !isHoliday(s.val);});
+var body='';
+if(live.length===0 && hols.length){ body='<div class="hol">Public holiday<small>No classes</small></div>'; }
+else{
+var shown=live.filter(function(s){return !state.only||isMine(s.val);});
+if(!shown.length) body='<div class="none">'+(live.length?'Not on today':(d.name==='SUN'?'Rest day':'No classes'))+'</div>';
+else body='<div class="rows">'+shown.map(function(s){
+var me=isMine(s.val); if(me) total++;
+return '<div class="r'+(me?' me':'')+'"><span class="tm">'+esc(s.time)+(s.kids?'<span class="kid">KIDS</span>':'')+'</span><span class="nm'+(isTBC(s.val)?' tbc':'')+'">'+(isTBC(s.val)?'TBC':esc(s.val))+'</span></div>';
+}).join('')+'</div>';
+}
+html+='<div class="day'+(isToday?' today':'')+(past?' past':'')+'"><div class="dh"><div><div class="dn">'+d.name+'<small>'+d.dnum+' '+d.mon+'</small></div>'+(isToday?'<span class="todaytag">TODAY</span>':'')+'</div><div class="dt">'+esc(d.type||'')+'</div></div>'+body+'</div>';
+});
+html+='</div></section>';
+});
+out.innerHTML=html;
+var mine=document.getElementById('mine');
+mine.innerHTML=state.who?('<b>'+total+'</b> class'+(total===1?'':'es')+' for '+esc(state.who)+' in these 3 weeks'):'';
+}
+function fillNames(){
+var set={};
+weeks.forEach(function(w){ w.days.forEach(function(d){ d.slots.forEach(function(s){
+if(isHoliday(s.val)||isTBC(s.val)) return; tokens(s.val).forEach(function(n){ set[n.charAt(0).toUpperCase()+n.slice(1)]=1; });
+});});});
+names=Object.keys(set).sort();
+whoSel.innerHTML='<option value="">Everyone</option>'+names.map(function(n){return '<option>'+esc(n)+'</option>';}).join('');
+if(state.who && names.map(function(n){return n.toLowerCase();}).indexOf(state.who.toLowerCase())<0) state.who='';
+whoSel.value=state.who;
+syncOnly();
+}
+function syncOnly(){
+document.getElementById('onlyWrap').hidden=!state.who;
+document.getElementById('only').checked=state.only&&!!state.who;
+if(!state.who) state.only=false;
+}
+whoSel.addEventListener('change',function(){ state.who=whoSel.value; try{localStorage.setItem('s30-roster-who',state.who);}catch(e){} syncOnly(); render(); });
+document.getElementById('only').addEventListener('change',function(e){ state.only=e.target.checked; try{localStorage.setItem('s30-roster-only',state.only?'1':'0');}catch(e2){} render(); });
+function fetchTab(name){
+var url='https://docs.google.com/spreadsheets/d/'+SHEET+'/gviz/tq?tqx=out:csv&sheet='+encodeURIComponent(name)+'&_='+Date.now();
+return fetch(url,{cache:'no-store'}).then(function(r){ if(!r.ok) throw new Error(r.status); return r.text(); }).then(parseCSV).then(parseTab);
+}
+function load(){
+Promise.all(TABS.map(function(n){ return fetchTab(n).catch(function(){ return []; }); })).then(function(all){
+var seen={}, list=[];
+all.forEach(function(a){ a.forEach(function(w){ if(!seen[w.start]){ seen[w.start]=1; list.push(w); } }); });
+list.sort(function(a,b){return a.start-b.start;});
+if(!list.length){ out.innerHTML='<div class="msg">Could not load the roster. Pull down to refresh.</div>'; return; }
+weeks=list; fillNames(); render();
+var n=new Date(); document.getElementById('stamp').textContent='Live from the roster sheet • updated '+n.toLocaleTimeString('en-NZ',{hour:'numeric',minute:'2-digit',timeZone:'Pacific/Auckland'});
+});
+}
+load();
+setInterval(load,5*60*1000);
+document.addEventListener('visibilitychange',function(){ if(!document.hidden) load(); });
+})();
+</script>
+</body>
+</html>
