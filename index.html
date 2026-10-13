@@ -145,10 +145,12 @@ if(h>=rows.length) continue;
 var hdr=rows[h], days=[], prevM=-1, y=yr;
 for(var d=0;d<7;d++){
 var cellh=(hdr[d+1]||'').split('\n'), top=(cellh[0]||'').trim().toUpperCase(), type=(cellh[1]||'').trim();
-var m=top.match(/(\d{1,2})\s+([A-Z]{3})/); if(!m){ days.push(null); continue; }
+var m=top.match(/(\d{1,2})\s+([A-Z]{3})/); if(!m){ days.push({name:DAYN[d],miss:true,type:/HOLIDAY/i.test(top+cellh.join(' '))?'':type,slots:[]}); continue; }
 var mi=MONTHS.indexOf(m[2]); if(prevM>=0 && mi<prevM) y++; prevM=mi;
 days.push({name:DAYN[d],dnum:+m[1],mon:m[2],type:type,ms:Date.UTC(y,mi,+m[1]),slots:[]});
 }
+var anc=-1; days.forEach(function(x,k){ if(anc<0&&x&&!x.miss) anc=k; });
+if(anc>=0) days.forEach(function(x,k){ if(x&&x.miss){ var dd=new Date(days[anc].ms+(k-anc)*86400000); x.ms=dd.getTime(); x.dnum=dd.getUTCDate(); x.mon=MONTHS[dd.getUTCMonth()]; x.miss=false; } });
 var r=h+1;
 while(r<rows.length){
 var lab=(rows[r][0]||'').trim();
