@@ -158,11 +158,9 @@ body.locked .wrap{display:none}
 
 <nav class="ptabs" id="ptabs">
 <button class="ptab on" data-p="roster">Roster</button>
-<button class="ptab" data-p="notices">Team Notices <span class="n" id="n-notices"></span></button>
-<button class="ptab" data-p="intros">Class Intros</button>
 <button class="ptab" data-p="milestones">250 / 500 Club <span class="n" id="n-milestones"></span></button>
 <button class="ptab" data-p="newbies">New Members <span class="n" id="n-newbies"></span></button>
-<button class="ptab" data-p="injuries">Injuries <span class="n" id="n-injuries"></span></button>
+<button class="ptab" data-p="notices">Team Notices <span class="n" id="n-notices"></span></button>
 <button class="ptab" data-p="passwords">Passwords</button>
 </nav>
 <section class="panel" id="pn-roster">
@@ -177,10 +175,8 @@ body.locked .wrap{display:none}
 <main id="out"><div class="msg">Loading roster...</div></main>
 </section>
 <section class="panel" id="pn-notices" hidden><h2 class="ph">Team <em>Notices</em></h2><p class="pdesc">What's happening in the studio. Newest at the top.</p><div class="plist" id="pl-notices"></div></section>
-<section class="panel" id="pn-intros" hidden><h2 class="ph">Class <em>Intros</em></h2><p class="pdesc">Things to mention at the start of class this week.</p><div class="plist" id="pl-intros"></div></section>
 <section class="panel" id="pn-milestones" hidden><h2 class="ph">250 / 500 <em>Club</em></h2><p class="pdesc">Members about to hit (or who just hit) a big milestone. Give them a shout-out!</p><div class="plist" id="pl-milestones"></div></section>
 <section class="panel" id="pn-newbies" hidden><h2 class="ph">New <em>Members</em></h2><p class="pdesc">New faces to look out for in class. Say hi, learn their name, check their technique.</p><div class="plist" id="pl-newbies"></div></section>
-<section class="panel" id="pn-injuries" hidden><h2 class="ph">Member <em>Injuries</em></h2><p class="pdesc">Members to keep an eye on and what to modify. Keep this between the team.</p><div class="plist" id="pl-injuries"></div></section>
 <section class="panel" id="pn-passwords" hidden><h2 class="ph">Pass<em>words</em></h2><p class="pdesc">Logins the team needs. Tap Show to reveal, Copy to copy.</p><div class="plist" id="pl-passwords"></div></section>
 
 <footer>
@@ -335,7 +331,7 @@ document.addEventListener('visibilitychange',function(){ if(!document.hidden) lo
 var SHEET='1JVCmSv-PZV6_xcdvxiri5eH5lNe6EoB_MKBkPZnsaxs';
 var PIN_HASH='b74b7e3fcb623d805dacf98db27530f845760c47e3b0faa702b84e9ff3902c37';
 var KEY='s30-portal-ok';
-var TABMAP={notices:'Notices',intros:'Class Intros',milestones:'Milestones',newbies:'New Members',injuries:'Injuries',passwords:'Passwords'};
+var TABMAP={notices:'Notices',milestones:'Milestones',newbies:'New Members',passwords:'Passwords'};
 var loaded={};
 
 /* ---------- PIN gate ---------- */
@@ -451,7 +447,7 @@ function load(id,force){
     if(!rows.length) count(id,0);
   }).catch(function(){ loaded[id]=false; box.innerHTML='<div class="empty">Couldn\'t load this tab. Check the <b>'+esc(TABMAP[id])+'</b> tab exists in the roster sheet, then refresh.</div>'; });
 }
-function preload(){ ['notices','milestones','newbies','injuries'].forEach(function(id){ load(id); }); }
+function preload(){ ['milestones','newbies','notices'].forEach(function(id){ load(id); }); }
 
 /* ---------- password buttons ---------- */
 document.addEventListener('click',function(e){
