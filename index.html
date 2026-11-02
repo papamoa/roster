@@ -411,8 +411,8 @@ var R={
     rows.sort(function(a,b){ return dmy(col(b,1))-dmy(col(a,1)); });
     count('newbies',rows.length);
     return rows.map(function(r){
-      return '<div class="pcard"><div class="t"><span class="nm">'+esc(col(r,0))+'</span>'+(col(r,2)?'<span class="tag">'+esc(col(r,2))+'</span>':'')+'</div>'+
-        (col(r,1)?'<div class="meta">Started '+esc(col(r,1))+'</div>':'')+(col(r,3)?'<div class="body">'+esc(col(r,3))+'</div>':'')+'</div>';
+      return '<div class="pcard"><div class="t"><span class="nm">'+esc(col(r,0))+'</span>'+'</div>'+
+        (col(r,1)?'<div class="meta">Started '+esc(col(r,1))+'</div>':'')+(col(r,2)?'<span class="lbl">Injuries / Notes</span><div class="body" style="margin-top:2px">'+esc(col(r,2))+'</div>':'')+'</div>';
     }).join('');
   },
   injuries:function(rows){
