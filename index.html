@@ -140,7 +140,7 @@ body.locked .wrap{display:none}
 <svg viewBox="0 0 420 540" aria-hidden="true"><path d="M0,0 L170,0 L420,270 L170,540 L0,540 L250,270 Z" fill="#EDB527"/></svg>
 <h1>Coaches<span>Portal</span></h1>
 <p>Studio Thirty Papamoa &middot; staff only</p>
-<input id="pin" type="password" inputmode="numeric" placeholder="PIN" aria-label="Staff PIN">
+<input id="pin" type="password" placeholder="Password" aria-label="Staff password" autocapitalize="none" autocorrect="off" spellcheck="false">
 <button type="submit">Let me in</button>
 <div class="gate-err" id="gateErr"></div>
 </form>
@@ -331,7 +331,7 @@ document.addEventListener('visibilitychange',function(){ if(!document.hidden) lo
 <script>
 (function(){
 var SHEET='1JVCmSv-PZV6_xcdvxiri5eH5lNe6EoB_MKBkPZnsaxs';
-var PIN_HASH='b74b7e3fcb623d805dacf98db27530f845760c47e3b0faa702b84e9ff3902c37';
+var PIN_HASH='4b19cfb4e7b76356c66320ef5e21a45f3e5ccb8236c50a60a1be2b32df2d1a64';
 var KEY='s30-portal-ok';
 var TABMAP={notices:'Notices',milestones:'Milestones',newbies:'New Members',trouble:'Troubleshooting',passwords:'Passwords'};
 var loaded={};
@@ -344,9 +344,9 @@ var ok=false; try{ ok=localStorage.getItem(KEY)===PIN_HASH; }catch(e){}
 if(ok) unlock(); else { document.body.classList.add('locked'); setTimeout(function(){ pin.focus(); },50); }
 form.addEventListener('submit',function(e){
   e.preventDefault();
-  sha(pin.value.trim()).then(function(h){
+  sha(pin.value.trim().toLowerCase()).then(function(h){
     if(h===PIN_HASH){ try{localStorage.setItem(KEY,h);}catch(e2){} err.textContent=''; unlock(); }
-    else { err.textContent='Wrong PIN, try again'; form.classList.remove('shake'); void form.offsetWidth; form.classList.add('shake'); pin.value=''; pin.focus(); }
+    else { err.textContent='Wrong password, try again'; form.classList.remove('shake'); void form.offsetWidth; form.classList.add('shake'); pin.value=''; pin.focus(); }
   });
 });
 var lb=document.getElementById('lockBtn');
