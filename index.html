@@ -132,6 +132,30 @@ body.locked .wrap{display:none}
 .pw button:active{background:var(--mustard);color:#000}
 .empty{background:var(--panel);border:1px dashed var(--line);border-radius:12px;padding:18px;color:var(--muted);text-align:center;font-size:14px}
 .lockbtn{background:none;border:0;color:var(--dim);font:600 12px 'Inter',sans-serif;cursor:pointer;text-decoration:underline}
+
+/* ===== Workouts tab ===== */
+.wwrap .wh{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:14px;border-bottom:2px solid var(--line);padding-bottom:10px}
+.wwrap .wh h2{font-family:'Anton',sans-serif;font-weight:400;font-size:clamp(24px,4.5vw,34px);letter-spacing:1px;text-transform:uppercase;color:var(--cream)}
+.wwrap .wh h2 em{font-style:normal;color:transparent;-webkit-text-stroke:1.4px var(--cream)}
+.wday{background:var(--panel);border:1px solid var(--line);margin-bottom:14px}
+.wday.today{border:2px solid var(--mustard);box-shadow:0 0 0 3px rgba(237,181,39,.15)}
+.wdh{background:var(--cream);color:var(--black);padding:9px 12px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.wday.today .wdh{background:var(--mustard)}
+.wdn{font-family:'Anton',sans-serif;font-size:22px;line-height:1;letter-spacing:.5px}
+.wdn small{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;letter-spacing:.1em;margin-left:6px}
+.wblock{padding:12px 14px;border-top:1px solid var(--line)}
+.wblock:first-of-type{border-top:0}
+.wbh{display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap}
+.wbh .blk{font-family:'Michroma',sans-serif;font-size:10px;letter-spacing:.18em;background:var(--mustard);color:#000;padding:3px 7px;flex:none}
+.wbh .fmt{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:15px;letter-spacing:.03em;text-transform:uppercase;color:var(--cream)}
+.wsides{display:grid;grid-template-columns:1fr 1fr;gap:4px 16px}
+@media (max-width:560px){ .wsides{grid-template-columns:1fr} }
+.wside h4{font:700 11px 'Barlow Condensed',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--mustard);margin:6px 0 2px}
+.wex{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:6px 0;border-top:1px solid var(--line);font-size:14px}
+.wex:first-child{border-top:0}
+.wex .en{color:var(--cream);font-weight:600;line-height:1.25}
+.wex .em{color:var(--muted);white-space:nowrap;font-size:12.5px;flex:none}
+.wnone{padding:16px 14px;color:var(--dim);font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:14px}
 </style>
 </head>
 <body class="locked">
@@ -158,6 +182,7 @@ body.locked .wrap{display:none}
 
 <nav class="ptabs" id="ptabs">
 <button class="ptab on" data-p="roster">Roster</button>
+<button class="ptab" data-p="workouts">Workouts</button>
 <button class="ptab" data-p="milestones">250 / 500 Club <span class="n" id="n-milestones"></span></button>
 <button class="ptab" data-p="newbies">New Members <span class="n" id="n-newbies"></span></button>
 <button class="ptab" data-p="notices">Team Notices <span class="n" id="n-notices"></span></button>
@@ -175,6 +200,7 @@ body.locked .wrap{display:none}
 </div>
 <main id="out"><div class="msg">Loading roster...</div></main>
 </section>
+<section class="panel" id="pn-workouts" hidden><h2 class="ph">This Week's <em>Workouts</em></h2><p class="pdesc">Pulled straight from the programming sheet. Flips over to the new week automatically from Sunday.</p><div id="pl-workouts"><div class="msg">Loading workouts...</div></div></section>
 <section class="panel" id="pn-notices" hidden><h2 class="ph">Team <em>Notices</em></h2><p class="pdesc">What's happening in the studio. Newest at the top.</p><div class="plist" id="pl-notices"></div></section>
 <section class="panel" id="pn-milestones" hidden><h2 class="ph">250 / 500 <em>Club</em></h2><p class="pdesc">Members about to hit (or who just hit) a big milestone. Give them a shout-out!</p><div class="plist" id="pl-milestones"></div></section>
 <section class="panel" id="pn-newbies" hidden><h2 class="ph">New <em>Members</em></h2><p class="pdesc">New faces to look out for in class. Say hi, learn their name, check their technique.</p><div class="plist" id="pl-newbies"></div></section>
@@ -445,6 +471,7 @@ var R={
 var pwRows=[];
 
 function load(id,force){
+  if(id==='workouts') return; /* handled by its own script block */
   if(loaded[id]&&!force) return;
   loaded[id]=true;
   var box=document.getElementById('pl-'+id);
@@ -482,6 +509,144 @@ function show(p){
 Array.prototype.forEach.call(tabs,function(t){ t.addEventListener('click',function(){ var p=t.getAttribute('data-p'); history.replaceState(null,'','#'+p); show(p); }); });
 show((location.hash||'#roster').slice(1));
 document.addEventListener('visibilitychange',function(){ if(!document.hidden){ Object.keys(loaded).forEach(function(id){ if(loaded[id]) load(id,true); }); } });
+})();
+</script>
+
+<script>
+(function(){
+/* Reads the studio's "S30 Weekly Programming Template" workbook directly (read-only) and
+   shows Monday-Saturday for the current week, flipping to next week's rows from Sunday.
+   This never writes to that sheet, and has nothing to do with the TV/streaming display setup
+   that also reads from it - it's just another reader. */
+var PROG_SHEET='1iSoKGkCElTCuqpi82_TEGQwB5vaxLDHK';
+var PROG_GID='1915124426';
+var MONTHS=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+var DAYS=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+var box=document.getElementById('pl-workouts');
+var wLoaded=false, wLoading=false;
+
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+function parseCSV(t){
+  var rows=[],row=[],cell='',q=false,i=0,c;
+  for(;i<t.length;i++){ c=t[i];
+    if(q){ if(c==='"'){ if(t[i+1]==='"'){cell+='"';i++;} else q=false; } else cell+=c; }
+    else if(c==='"') q=true;
+    else if(c===','){ row.push(cell); cell=''; }
+    else if(c==='\n'){ row.push(cell); rows.push(row); row=[]; cell=''; }
+    else if(c!=='\r') cell+=c;
+  }
+  if(cell!==''||row.length){ row.push(cell); rows.push(row); }
+  return rows;
+}
+function nzToday(){
+  var p=new Intl.DateTimeFormat('en-CA',{timeZone:'Pacific/Auckland',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date()).split('-');
+  return Date.UTC(+p[0],+p[1]-1,+p[2]);
+}
+function ymd(ms){ var d=new Date(ms); var y=d.getUTCFullYear(),m=String(d.getUTCMonth()+1).padStart(2,'0'),day=String(d.getUTCDate()).padStart(2,'0'); return y+'-'+m+'-'+day; }
+function fmtShort(ms){ var d=new Date(ms); return d.getUTCDate()+' '+MONTHS[d.getUTCMonth()]; }
+
+function parseProgramming(text){
+  var rows=parseCSV(text);
+  rows.shift(); // header: Week Starting, Day, Block, Format, Side, Exercise, Sets, Reps, Tempo, Location, , , NOTES
+  var weeks={}, order=[];
+  rows.forEach(function(r){
+    var wk=(r[0]||'').trim(); if(!wk) return;
+    var day=(r[1]||'').trim(); if(!day) return;
+    var loc=(r[9]||'').trim();
+    if(loc && !/papamoa/i.test(loc)) return; // this portal is Papamoa only - same rule the TV displays use
+    if(!weeks[wk]){ weeks[wk]={start:wk,days:{}}; order.push(wk); }
+    if(!weeks[wk].days[day]) weeks[wk].days[day]={blockOrder:[],blocks:{}};
+    var dayObj=weeks[wk].days[day];
+    var block=(r[2]||'').trim()||'A';
+    if(!dayObj.blocks[block]){ dayObj.blocks[block]={format:(r[3]||'').trim(),sideOrder:[],sides:{}}; dayObj.blockOrder.push(block); }
+    var blockObj=dayObj.blocks[block];
+    var side=(r[4]||'').trim();
+    var sideKey=side||'_';
+    if(!blockObj.sides[sideKey]){ blockObj.sides[sideKey]={label:side,items:[]}; blockObj.sideOrder.push(sideKey); }
+    var ex=(r[5]||'').trim(); if(!ex) return;
+    blockObj.sides[sideKey].items.push({ex:ex,sets:(r[6]||'').trim(),reps:(r[7]||'').trim(),tempo:(r[8]||'').trim()});
+  });
+  order.sort();
+  return order.map(function(k){ return weeks[k]; });
+}
+
+function pickWeek(weeks,t){
+  var dow=new Date(t).getUTCDay(); // 0=Sun..6=Sat
+  var targetMonday = dow===0 ? t+86400000 : t-(dow-1)*86400000;
+  var key=ymd(targetMonday);
+  var w=weeks.filter(function(x){return x.start===key;})[0];
+  if(!w) w=weeks.filter(function(x){return x.start>key;})[0];
+  if(!w && weeks.length) w=weeks[weeks.length-1];
+  return w;
+}
+
+function exMeta(it){
+  var m='';
+  if(it.sets && it.reps) m=it.sets+' x '+it.reps;
+  else if(it.reps) m=it.reps;
+  else if(it.sets) m=it.sets+(it.sets==='1'?' set':' sets');
+  if(it.tempo) m+=(m?' · ':'')+'tempo '+it.tempo;
+  return m;
+}
+
+function renderWeek(w,t){
+  var startMs=Date.parse(w.start+'T00:00:00Z');
+  var html='<div class="wh"><h2>Week of <em>'+fmtShort(startMs)+'</em></h2></div>';
+  DAYS.forEach(function(dname,i){
+    var dms=startMs+i*86400000, isToday=dms===t;
+    var dayObj=w.days[dname];
+    html+='<div class="wday'+(isToday?' today':'')+'"><div class="wdh"><div class="wdn">'+dname.slice(0,3).toUpperCase()+'<small>'+fmtShort(dms)+'</small></div>'+(isToday?'<span class="todaytag">TODAY</span>':'')+'</div>';
+    if(!dayObj || !dayObj.blockOrder.length){
+      html+='<div class="wnone">No workout programmed</div>';
+    } else {
+      dayObj.blockOrder.forEach(function(bk){
+        var b=dayObj.blocks[bk];
+        html+='<div class="wblock"><div class="wbh"><span class="blk">Block '+esc(bk)+'</span><span class="fmt">'+esc(b.format)+'</span></div>';
+        if(b.sideOrder.length>1){
+          html+='<div class="wsides">'+b.sideOrder.map(function(sk){
+            var s=b.sides[sk];
+            return '<div class="wside">'+(s.label?'<h4>'+esc(s.label)+'</h4>':'')+s.items.map(function(it){
+              return '<div class="wex"><span class="en">'+esc(it.ex)+'</span><span class="em">'+esc(exMeta(it))+'</span></div>';
+            }).join('')+'</div>';
+          }).join('')+'</div>';
+        } else {
+          var only=b.sides[b.sideOrder[0]]||{items:[]};
+          html+=only.items.map(function(it){
+            return '<div class="wex"><span class="en">'+esc(it.ex)+'</span><span class="em">'+esc(exMeta(it))+'</span></div>';
+          }).join('');
+        }
+        html+='</div>';
+      });
+    }
+    html+='</div>';
+  });
+  return '<div class="wwrap">'+html+'</div>';
+}
+
+function loadWorkouts(force){
+  if(wLoading) return;
+  if(wLoaded && !force) return;
+  wLoading=true;
+  var url='https://docs.google.com/spreadsheets/d/'+PROG_SHEET+'/gviz/tq?tqx=out:csv&gid='+PROG_GID+'&_='+Date.now();
+  fetch(url,{cache:'no-store'}).then(function(r){ if(!r.ok) throw new Error(r.status); return r.text(); }).then(function(text){
+    wLoading=false; wLoaded=true;
+    var weeks=parseProgramming(text);
+    if(!weeks.length){ box.innerHTML='<div class="empty">No workouts found. Check the Programming sheet still has rows.</div>'; return; }
+    var t=nzToday();
+    var w=pickWeek(weeks,t);
+    if(!w){ box.innerHTML='<div class="empty">Nothing programmed for this week yet.</div>'; return; }
+    box.innerHTML=renderWeek(w,t);
+  }).catch(function(){
+    wLoading=false; wLoaded=false;
+    box.innerHTML='<div class="empty">Couldn\'t load the workouts sheet. Check the connection and refresh.</div>';
+  });
+}
+
+Array.prototype.forEach.call(document.querySelectorAll('.ptab'),function(t){
+  t.addEventListener('click',function(){ if(t.getAttribute('data-p')==='workouts') loadWorkouts(); });
+});
+if((location.hash||'#roster').slice(1)==='workouts') loadWorkouts();
+document.addEventListener('visibilitychange',function(){ if(!document.hidden && wLoaded && (location.hash||'').slice(1)==='workouts') loadWorkouts(true); });
 })();
 </script>
 </body>
