@@ -151,10 +151,13 @@ body.locked .wrap{display:none}
 .wsides{display:grid;grid-template-columns:1fr 1fr;gap:4px 16px}
 @media (max-width:560px){ .wsides{grid-template-columns:1fr} }
 .wside h4{font:700 11px 'Barlow Condensed',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--mustard);margin:6px 0 2px}
-.wex{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:6px 0;border-top:1px solid var(--line);font-size:14px}
+.wex{padding:6px 0;border-top:1px solid var(--line);font-size:14px}
 .wex:first-child{border-top:0}
+.wextop{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
 .wex .en{color:var(--cream);font-weight:600;line-height:1.25}
 .wex .em{color:var(--muted);white-space:nowrap;font-size:12.5px;flex:none}
+.wnote{margin-top:5px;padding:6px 9px;background:rgba(237,181,39,.08);border-left:2px solid var(--mustard);font-size:12.5px;line-height:1.4;color:var(--cream)}
+.wnote b{display:inline-block;color:var(--mustard);font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.14em;text-transform:uppercase;font-size:10.5px;margin-right:7px}
 .wnone{padding:16px 14px;color:var(--dim);font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.1em;text-transform:uppercase;font-size:14px}
 </style>
 </head>
@@ -547,7 +550,7 @@ function fmtShort(ms){ var d=new Date(ms); return d.getUTCDate()+' '+MONTHS[d.ge
 
 function parseProgramming(text){
   var rows=parseCSV(text);
-  rows.shift(); // header: Week Starting, Day, Block, Format, Side, Exercise, Sets, Reps, Tempo, Location, , , NOTES
+  rows.shift(); // header: Week Starting, Day, Block, Format, Side, Exercise, Sets, Reps, Tempo, Location, Coach notes, , NOTES
   var weeks={}, order=[];
   rows.forEach(function(r){
     var wk=(r[0]||'').trim(); if(!wk) return;
@@ -564,7 +567,7 @@ function parseProgramming(text){
     var sideKey=side||'_';
     if(!blockObj.sides[sideKey]){ blockObj.sides[sideKey]={label:side,items:[]}; blockObj.sideOrder.push(sideKey); }
     var ex=(r[5]||'').trim(); if(!ex) return;
-    blockObj.sides[sideKey].items.push({ex:ex,sets:(r[6]||'').trim(),reps:(r[7]||'').trim(),tempo:(r[8]||'').trim()});
+    blockObj.sides[sideKey].items.push({ex:ex,sets:(r[6]||'').trim(),reps:(r[7]||'').trim(),tempo:(r[8]||'').trim(),note:(r[10]||'').trim()});
   });
   order.sort();
   return order.map(function(k){ return weeks[k]; });
@@ -606,13 +609,13 @@ function renderWeek(w,t){
           html+='<div class="wsides">'+b.sideOrder.map(function(sk){
             var s=b.sides[sk];
             return '<div class="wside">'+(s.label?'<h4>'+esc(s.label)+'</h4>':'')+s.items.map(function(it){
-              return '<div class="wex"><span class="en">'+esc(it.ex)+'</span><span class="em">'+esc(exMeta(it))+'</span></div>';
+              return '<div class="wex"><div class="wextop"><span class="en">'+esc(it.ex)+'</span><span class="em">'+esc(exMeta(it))+'</span></div>'+(it.note?'<div class="wnote"><b>Coach note</b>'+esc(it.note)+'</div>':'')+'</div>';
             }).join('')+'</div>';
           }).join('')+'</div>';
         } else {
           var only=b.sides[b.sideOrder[0]]||{items:[]};
           html+=only.items.map(function(it){
-            return '<div class="wex"><span class="en">'+esc(it.ex)+'</span><span class="em">'+esc(exMeta(it))+'</span></div>';
+            return '<div class="wex"><div class="wextop"><span class="en">'+esc(it.ex)+'</span><span class="em">'+esc(exMeta(it))+'</span></div>'+(it.note?'<div class="wnote"><b>Coach note</b>'+esc(it.note)+'</div>':'')+'</div>';
           }).join('');
         }
         html+='</div>';
