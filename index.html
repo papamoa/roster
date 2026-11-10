@@ -81,6 +81,9 @@ footer a{color:var(--mustard);text-decoration:none;border-bottom:1px solid var(-
 .dt{text-align:left;margin-top:4px;padding-top:0}
 .kid{display:block;width:max-content;margin:3px 0 0}
 .nm{overflow-wrap:break-word}
+.r.wt{flex-wrap:wrap;row-gap:0}
+.r.wt .tg{flex-basis:100%;display:block;margin-top:3px}
+.r.wt .tg .kid{margin:0}
 
 /* ===== Coaches Portal additions ===== */
 body.locked .wrap{display:none}
@@ -307,8 +310,8 @@ else{
 var shown=live.filter(function(s){return !state.only||isMine(s.val);});
 if(!shown.length) body='<div class="none">'+(live.length?'Not on today':(d.name==='SUN'?'Rest day':'No classes'))+'</div>';
 else body='<div class="rows">'+shown.map(function(s){
-var me=isMine(s.val); if(me) total++;
-return '<div class="r'+(me?' me':'')+'"><span class="tm">'+esc(s.time)+(s.tag?'<span class="kid">'+esc(s.tag)+'</span>':'')+'</span><span class="nm'+(isTBC(s.val)?' tbc':'')+'">'+(isTBC(s.val)?'TBC':esc(s.val))+'</span></div>';
+var me=isMine(s.val); if(me) total++; var wide=!!s.tag&&s.tag.length>5;
+return '<div class="r'+(me?' me':'')+(wide?' wt':'')+'"><span class="tm">'+esc(s.time)+(s.tag&&!wide?'<span class="kid">'+esc(s.tag)+'</span>':'')+'</span><span class="nm'+(isTBC(s.val)?' tbc':'')+'">'+(isTBC(s.val)?'TBC':esc(s.val))+'</span>'+(wide?'<span class="tg"><span class="kid">'+esc(s.tag)+'</span></span>':'')+'</div>';
 }).join('')+'</div>';
 }
 html+='<div class="day'+(isToday?' today':'')+(past?' past':'')+'"><div class="dh"><div><div class="dn">'+d.name+'<small>'+d.dnum+' '+d.mon+'</small></div>'+(isToday?'<span class="todaytag">TODAY</span>':'')+'</div><div class="dt">'+esc(d.type||'')+'</div></div>'+body+'</div>';
