@@ -191,6 +191,7 @@ body.locked .wrap{display:none}
 <button class="ptab" data-p="workouts">Workouts</button>
 <button class="ptab" data-p="milestones">250 / 500 Club <span class="n" id="n-milestones"></span></button>
 <button class="ptab" data-p="newbies">New Members <span class="n" id="n-newbies"></span></button>
+<button class="ptab" data-p="trials">Trials <span class="n" id="n-trials"></span></button>
 <button class="ptab" data-p="notices">Team Notices <span class="n" id="n-notices"></span></button>
 <button class="ptab" data-p="trouble">Troubleshooting <span class="n" id="n-trouble"></span></button>
 <button class="ptab" data-p="passwords">Passwords</button>
@@ -207,6 +208,7 @@ body.locked .wrap{display:none}
 <main id="out"><div class="msg">Loading roster...</div></main>
 </section>
 <section class="panel" id="pn-workouts" hidden><h2 class="ph">This Week's <em>Workouts</em></h2><p class="pdesc">Pulled straight from the programming sheet. Flips over to the new week automatically from Sunday.</p><div id="pl-workouts"><div class="msg">Loading workouts...</div></div></section>
+<section class="panel" id="pn-trials" hidden><h2 class="ph">Upcoming <em>Trials</em></h2><p class="pdesc">New people coming in for a trial. Learn their name, give them a warm welcome and look after them in class.</p><div class="plist" id="pl-trials"></div></section>
 <section class="panel" id="pn-notices" hidden><h2 class="ph">Team <em>Notices</em></h2><p class="pdesc">What's happening in the studio. Newest at the top.</p><div class="plist" id="pl-notices"></div></section>
 <section class="panel" id="pn-milestones" hidden><h2 class="ph">250 / 500 <em>Club</em></h2><p class="pdesc">Members about to hit (or who just hit) a big milestone. Give them a shout-out!</p><div class="plist" id="pl-milestones"></div></section>
 <section class="panel" id="pn-newbies" hidden><h2 class="ph">New <em>Members</em></h2><p class="pdesc">New faces to look out for in class. Say hi, learn their name, check their technique.</p><div class="plist" id="pl-newbies"></div></section>
@@ -365,7 +367,7 @@ document.addEventListener('visibilitychange',function(){ if(!document.hidden) lo
 var SHEET='1JVCmSv-PZV6_xcdvxiri5eH5lNe6EoB_MKBkPZnsaxs';
 var PIN_HASH='4b19cfb4e7b76356c66320ef5e21a45f3e5ccb8236c50a60a1be2b32df2d1a64';
 var KEY='s30-portal-ok';
-var TABMAP={notices:'Notices',milestones:'Milestones',newbies:'New Members',trouble:'Troubleshooting',passwords:'Passwords'};
+var TABMAP={trials:'Trials',notices:'Notices',milestones:'Milestones',newbies:'New Members',trouble:'Troubleshooting',passwords:'Passwords'};
 var loaded={};
 
 /* ---------- PIN gate ---------- */
@@ -409,11 +411,26 @@ function getTab(name){
 }
 function col(o,i){ return o._cells[i]||''; }
 function dmy(s){ var m=String(s).match(/(\d{1,2})\/(\d{1,2})\/(\d{2,4})/); if(!m) return 0; var y=+m[3]; if(y<100) y+=2000; return new Date(y,+m[2]-1,+m[1]).getTime(); }
-function empty(tab){ return '<div class="empty">Nothing here yet. Add rows to the <b>'+esc(tab)+'</b> tab in the roster sheet and they\'ll show up here.</div>'; }
+function tmin(s){ var m=String(s).match(/(\d{1,2}):(\d{2})\s*([ap])/i); if(!m) return 0; var h=+m[1]%12; if(/p/i.test(m[3])) h+=12; return h*60+ +m[2]; }
+function empty(tab){ if(tab==='Trials') return '<div class="empty">No trials booked right now. They show up here as soon as one is booked.</div>'; return '<div class="empty">Nothing here yet. Add rows to the <b>'+esc(tab)+'</b> tab in the roster sheet and they\'ll show up here.</div>'; }
 function count(id,n){ var el=document.getElementById('n-'+id); if(el) el.textContent=n?n:''; }
 
 /* ---------- renderers ---------- */
 var R={
+  trials:function(rows){
+    rows.sort(function(a,b){ return (dmy(col(a,0))-dmy(col(b,0)))||(tmin(col(a,2))-tmin(col(b,2))); });
+    count('trials',rows.length);
+    var t0=new Date(); t0.setHours(0,0,0,0); var last='', out='';
+    rows.forEach(function(r){
+      var d=dmy(col(r,0)), diff=Math.round((d-t0.getTime())/864e5);
+      var head=diff===0?'Today':diff===1?'Tomorrow':col(r,1);
+      if(head!==last){ out+='<div class="wk">'+esc(head)+(diff<2?' &middot; '+esc(col(r,1)):'')+'</div>'; last=head; }
+      out+='<div class="pcard"><div class="t"><span class="nm">'+esc(col(r,3))+'</span><span class="tag">'+esc(col(r,2))+'</span></div>'+
+        (col(r,4)?'<div class="meta">Coach: '+esc(col(r,4))+'</div>':'')+
+        (col(r,5)?'<span class="lbl">Notes</span><div class="body" style="margin-top:2px">'+esc(col(r,5))+'</div>':'')+'</div>';
+    });
+    return out;
+  },
   notices:function(rows){
     rows.sort(function(a,b){ return dmy(col(b,0))-dmy(col(a,0)); });
     count('notices',rows.length);
@@ -489,7 +506,7 @@ function load(id,force){
     if(!rows.length) count(id,0);
   }).catch(function(){ loaded[id]=false; box.innerHTML='<div class="empty">Couldn\'t load this tab. Check the <b>'+esc(TABMAP[id])+'</b> tab exists in the roster sheet, then refresh.</div>'; });
 }
-function preload(){ ['milestones','newbies','notices','trouble'].forEach(function(id){ load(id); }); }
+function preload(){ ['trials','milestones','newbies','notices','trouble'].forEach(function(id){ load(id); }); }
 
 /* ---------- password buttons ---------- */
 document.addEventListener('click',function(e){
