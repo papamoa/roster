@@ -1,0 +1,577 @@
+<!doctype html>
+<html lang="en-NZ">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#090909">
+<title>Trial Board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:ital,wght@0,400;0,700;0,800;1,700;1,800&family=Michroma&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#090909;color:#e9e4d8}
+img{max-width:100%}
+[hidden]:not([hidden=until-found i]){display:none!important}
+
+:root{
+  --bg:#090909; --card:#141414; --cream:#e9e4d8; --muted:#8d887c; --gold:#edb527;
+  --danger:#e8766c; --focus:#4b9bff;
+  color-scheme: dark;
+}
+*{box-sizing:border-box;}
+body{background:var(--bg); color:var(--cream);}
+.app{font-family:Inter,system-ui,sans-serif; font-size:15px; line-height:1.5;
+  padding-left:max(16px, env(safe-area-inset-left,0px)); padding-right:max(16px, env(safe-area-inset-right,0px));}
+.wrap{max-width:900px; margin:0 auto;}
+
+/* ---------- header, matching the portal's logo lockup ---------- */
+header.top{display:flex; align-items:flex-end; gap:16px; padding:28px 4px 18px; flex-wrap:wrap;}
+.chev{width:0; height:0; border-top:19px solid transparent; border-bottom:19px solid transparent; border-left:26px solid var(--gold); flex:none; margin-bottom:6px;}
+.wordmark{line-height:.86;}
+.wordmark .l1, .wordmark .l2{font-family:Anton,sans-serif; font-size:40px; letter-spacing:.3px; display:block;}
+.wordmark .l1{color:var(--cream);}
+.wordmark .l2{color:transparent; -webkit-text-stroke:1.4px var(--gold);}
+.sub{color:var(--gold); font-size:12.5px; font-weight:600; letter-spacing:2px; text-transform:uppercase; margin-top:6px;}
+.headRight{margin-left:auto; align-self:center;}
+.linklike{background:none; border:none; color:var(--muted); font:inherit; cursor:pointer; text-decoration:underline; text-underline-offset:2px; padding:0; font-size:13px;}
+.linklike:hover{color:var(--cream);}
+
+/* ---------- marquee stripe ---------- */
+.band-wrap{overflow:hidden; background:var(--gold); margin:0 -16px; }
+.band{display:flex; white-space:nowrap; font-family:Michroma,sans-serif; font-size:11px; letter-spacing:3.85px; color:var(--bg); text-transform:uppercase; padding:9px 0; animation:scrollband 22s linear infinite;}
+.band span{padding:0 22px;}
+@keyframes scrollband{ from{transform:translateX(0);} to{transform:translateX(-50%);} }
+@media (prefers-reduced-motion:reduce){ .band{animation:none;} }
+
+main{padding:26px 4px 70px;}
+.block{margin-bottom:40px;}
+.block h2{font-family:Anton,sans-serif; font-size:26px; font-weight:400; letter-spacing:.3px; margin:0 0 4px; text-transform:uppercase;}
+.block h2 .accent{color:var(--gold);}
+.block .desc{color:var(--muted); font-size:13px; margin-bottom:16px; max-width:66ch;}
+.err-banner{background:#2a1212; color:#ff8a7e; border-radius:8px; padding:10px 13px; font-size:13px; margin-bottom:18px; font-weight:600; border:1px solid rgba(232,118,108,.35);}
+
+/* ---------- pills / tabs-style buttons ---------- */
+.toolbar{display:flex; align-items:center; gap:10px; margin-bottom:14px; flex-wrap:wrap;}
+button.primary{background:var(--gold); color:#090909; border:1px solid var(--gold); font-family:"Barlow Condensed",sans-serif; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; font-size:14px; padding:9px 20px; border-radius:999px; cursor:pointer;}
+button.primary:hover{opacity:.88;}
+button.primary:disabled{opacity:.4; cursor:not-allowed;}
+button.ghost{background:var(--card); border:1px solid #2a2a2a; color:var(--cream); font-family:"Barlow Condensed",sans-serif; font-weight:700; letter-spacing:1px; text-transform:uppercase; font-size:13px; padding:8px 16px; border-radius:999px; cursor:pointer;}
+button.ghost:hover{border-color:var(--gold); color:var(--gold);}
+button.ghost.small{padding:5px 12px; font-size:11.5px;}
+
+.empty{color:var(--muted); font-size:13.5px; padding:16px 4px;}
+.skeleton{display:flex; flex-direction:column; gap:8px; padding:4px 0;}
+.skeleton .bar{height:14px; border-radius:4px; background:linear-gradient(90deg, #1c1c1c, #262626, #1c1c1c); background-size:200% 100%; animation:shimmer 1.4s infinite;}
+@keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+@media (prefers-reduced-motion:reduce){ .skeleton .bar{animation:none;} }
+
+/* ---------- weekly grid ---------- */
+.grid-scroll{overflow-x:auto;}
+.trial-grid{display:grid; grid-template-columns:58px repeat(7,minmax(96px,1fr)); gap:1px; background:#232323; border:1px solid #232323; border-radius:10px; overflow:hidden; min-width:660px;}
+.trial-grid .tg-head{background:var(--card); font-size:10.5px; text-transform:uppercase; color:var(--muted); text-align:center; padding:8px 2px; letter-spacing:1px; font-weight:600;}
+.trial-grid .tg-head.is-today{color:var(--gold);}
+.trial-grid .tg-head .dnum{display:block; font-family:"Barlow Condensed",sans-serif; font-size:16px; font-weight:700; color:var(--cream); margin-top:2px;}
+.trial-grid .tg-head.is-today .dnum{color:var(--bg); background:var(--gold); border-radius:50%; width:20px; height:20px; display:inline-flex; align-items:center; justify-content:center; margin-top:3px;}
+.trial-grid .tg-time{background:var(--card); font-family:"Barlow Condensed",sans-serif; font-size:12px; font-weight:700; color:var(--muted); padding:10px 6px; text-align:right; white-space:nowrap;}
+.trial-grid .tg-empty{grid-column:1/-1; background:var(--card); color:var(--muted); font-size:13px; padding:14px 10px;}
+.trial-grid .tg-cell{background:var(--card); min-height:48px; padding:4px; cursor:pointer; display:flex; flex-direction:column; gap:3px; min-width:0;}
+.trial-grid .tg-cell:hover{background:#1b1b1b;}
+.chip{display:block; width:100%; text-align:left; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; border:none; cursor:pointer;
+  font-family:"Barlow Condensed",sans-serif; font-size:12px; font-weight:700; letter-spacing:.4px; padding:3px 8px; border-radius:6px;
+  background:var(--gold); color:#090909;}
+.chip.signedUp{background:#2f6e3e; color:#d7f0dc;}
+.chip.noShow{background:#2a2a2a; color:var(--muted); text-decoration:line-through;}
+
+/* ---------- trial cards (follow-up list), matching the real portal's card style ---------- */
+.pcard{background:var(--card); border-radius:12px; border-left:4px solid var(--gold); padding:14px 16px; margin-bottom:10px; display:flex; align-items:flex-start; gap:14px; cursor:pointer;}
+.pcard:hover{background:#181818;}
+.pcard .t{font-family:"Barlow Condensed",sans-serif; font-weight:800; font-style:italic; font-size:18px; color:var(--cream);}
+.pcard .meta{color:var(--muted); font-size:12.5px; margin-top:2px;}
+.pcard .lbl{color:var(--gold); font-family:Inter,sans-serif; font-weight:700; font-size:11px; letter-spacing:1.4px; text-transform:uppercase; display:block; margin-top:8px;}
+.pcard .notebody{color:var(--cream); font-size:13px; margin-top:2px;}
+.pcard .main{flex:1; min-width:0;}
+.pcard .side{flex:none; display:flex; flex-direction:column; align-items:flex-end; gap:8px;}
+.tag{font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:12px; letter-spacing:1.2px; text-transform:uppercase; padding:3px 9px; border-radius:6px; background:var(--gold); color:#090909; white-space:nowrap;}
+.daylabel{color:var(--gold); font-family:Inter,sans-serif; font-weight:700; font-size:11.5px; letter-spacing:1.4px; text-transform:uppercase; margin:18px 0 8px;}
+.daylabel:first-child{margin-top:0;}
+.rowbtns{display:flex; gap:6px;}
+
+/* ---------- tabs ---------- */
+.tabs{display:flex; gap:18px; margin:0 4px 24px; border-bottom:1px solid #232323;}
+.tabbtn{background:none; border:none; color:var(--muted); font-family:"Barlow Condensed",sans-serif; font-weight:700; letter-spacing:1px; text-transform:uppercase; font-size:14px; padding:0 0 11px; cursor:pointer; border-bottom:2px solid transparent; margin-bottom:-1px;}
+.tabbtn:hover{color:var(--cream);}
+.tabbtn.active{color:var(--gold); border-bottom-color:var(--gold);}
+.tabpanel[hidden]{display:none;}
+
+/* ---------- text-reminder cards ---------- */
+.tcard{background:var(--card); border-radius:12px; border-left:4px solid var(--gold); padding:14px 16px; margin-bottom:10px;}
+.tcard .t{font-family:"Barlow Condensed",sans-serif; font-weight:800; font-style:italic; font-size:18px; color:var(--cream);}
+.tcard .meta{color:var(--muted); font-size:12.5px; margin-top:2px;}
+.tcard .phone{color:var(--cream); font-size:13px; margin-top:6px; font-family:"Barlow Condensed",sans-serif; letter-spacing:.3px; user-select:all;}
+.tcard .msgbox{background:#0d0d0d; border:1px solid #232323; border-radius:8px; padding:10px 12px; margin-top:10px; font-size:13px; color:var(--cream); white-space:pre-wrap; line-height:1.4; font-family:Inter,sans-serif; user-select:all;}
+.tcard .trow{display:flex; gap:6px; margin-top:10px; flex-wrap:wrap;}
+
+footer{max-width:900px; margin:0 auto; padding:14px 4px 40px; color:var(--muted); font-size:11.5px; letter-spacing:.5px; text-transform:uppercase; display:flex; justify-content:space-between; flex-wrap:wrap; gap:6px; border-top:1px solid #1e1e1e; margin-top:10px;}
+footer a{color:var(--gold); text-decoration:none;}
+
+dialog{border:none; border-radius:12px; padding:0; max-width:420px; width:92vw; background:var(--card); color:var(--cream); box-shadow:0 0 0 1px #2a2a2a, 0 16px 40px rgba(0,0,0,.5);}
+dialog::backdrop{background:rgba(0,0,0,.6);}
+.dialog-inner{padding:20px;}
+.dialog-inner h3{font-family:Anton,sans-serif; font-weight:400; font-size:20px; margin:0 0 14px; text-transform:uppercase; letter-spacing:.3px;}
+.dialog-inner input, .dialog-inner select, .dialog-inner textarea{width:100%; margin:6px 0; padding:9px 11px; border:1px solid #2a2a2a; border-radius:7px; background:#0d0d0d; color:var(--cream); font:inherit; font-family:Inter,sans-serif;}
+.dialog-inner input::placeholder, .dialog-inner textarea::placeholder{color:#5c584f;}
+.dialog-inner input:focus, .dialog-inner select:focus, .dialog-inner textarea:focus{outline:none; border-color:var(--gold);}
+.dialog-inner textarea{resize:vertical; min-height:50px;}
+.field-row{display:flex; gap:8px;}
+.field-row > *{flex:1;}
+.dialog-actions{display:flex; justify-content:flex-end; gap:8px; margin-top:14px;}
+.dialog-actions .danger{background:none; border:1px solid var(--danger); color:var(--danger); font-family:"Barlow Condensed",sans-serif; font-weight:700; letter-spacing:1px; text-transform:uppercase; font-size:13px; padding:8px 14px; border-radius:999px; cursor:pointer; margin-right:auto;}
+
+@media (max-width:560px){ .wordmark .l1, .wordmark .l2{font-size:32px;} }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="wrap">
+    <header class="top">
+      <div class="chev" aria-hidden="true"></div>
+      <div class="wordmark">
+        <span class="l1">TRIAL</span>
+        <span class="l2">BOARD</span>
+        <div class="sub">Studio Thirty · Papamoa</div>
+      </div>
+      <div class="headRight">
+        <button class="linklike" id="howItWorksBtn" type="button">How this works</button>
+      </div>
+    </header>
+  </div>
+
+  <div class="band-wrap">
+    <div class="band" aria-hidden="true">
+      <span>Work Hard</span><span>Play Hard</span><span>Work Hard</span><span>Play Hard</span><span>Work Hard</span><span>Play Hard</span><span>Work Hard</span><span>Play Hard</span>
+      <span>Work Hard</span><span>Play Hard</span><span>Work Hard</span><span>Play Hard</span><span>Work Hard</span><span>Play Hard</span><span>Work Hard</span><span>Play Hard</span>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <main>
+      <div id="globalError" class="err-banner" hidden>Couldn't reach the trial data. Check your connection and refresh.</div>
+
+      <div class="tabs" role="tablist">
+        <button class="tabbtn active" id="tabBtnBoard" data-tab="board" type="button" role="tab">Board</button>
+        <button class="tabbtn" id="tabBtnTexts" data-tab="texts" type="button" role="tab">Copy text reminders</button>
+      </div>
+
+      <div id="tab-board" class="tabpanel">
+        <div class="block">
+          <h2>This week's <span class="accent">trials</span></h2>
+          <div class="desc">Click an empty slot to book a trial, click a name to edit it or mark the outcome. A reminder email lands in the studio inbox about an hour before each trial — or by 5pm the day before for 5am classes.</div>
+          <div class="toolbar">
+            <button class="ghost" id="prevWeek" type="button">‹ Prev week</button>
+            <strong id="weekLabel" style="flex:1; text-align:center; font-family:'Barlow Condensed',sans-serif; font-weight:700; letter-spacing:.5px;"></strong>
+            <button class="ghost" id="nextWeek" type="button">Next week ›</button>
+          </div>
+          <div id="gridHolder" class="skeleton"><div class="bar" style="width:70%"></div><div class="bar" style="width:55%"></div><div class="bar" style="width:40%"></div></div>
+          <div class="toolbar" style="margin-top:16px; margin-bottom:0;">
+            <button class="primary" id="addTrialBtn" type="button">+ Book a trial</button>
+          </div>
+        </div>
+
+        <div class="block">
+          <h2>Needs <span class="accent">follow-up</span></h2>
+          <div class="desc">Past trials nobody's marked as signed up or not yet — tick off the outcome so these clear.</div>
+          <div id="followupList" class="skeleton"><div class="bar" style="width:50%"></div></div>
+        </div>
+      </div>
+
+      <div id="tab-texts" class="tabpanel" hidden>
+        <div class="block">
+          <h2>Copy text <span class="accent">reminders</span></h2>
+          <div class="desc">A ready-made reminder message for every upcoming trial — tap Copy text, then paste it into Messages to text the trialist yourself.</div>
+          <div id="textRemindersList" class="skeleton"><div class="bar" style="width:60%"></div><div class="bar" style="width:45%"></div></div>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <span id="footLeft">S30 Trial Board</span>
+      <span>Studio Thirty Papamoa</span>
+    </footer>
+  </div>
+</div>
+
+<dialog id="trialDialog">
+  <div class="dialog-inner">
+    <h3 id="trialDialogTitle">Book a trial</h3>
+    <input type="text" id="trialName" placeholder="Name">
+    <input type="text" id="trialPhone" placeholder="Phone (optional)">
+    <div class="field-row">
+      <input type="date" id="trialDate">
+      <input type="time" id="trialTime">
+    </div>
+    <div class="field-row">
+      <input type="text" id="trialClass" placeholder="Class (optional)">
+      <input type="text" id="trialCoach" placeholder="Coach (optional)">
+    </div>
+    <select id="trialStatus"><option value="booked">Booked</option><option value="signedUp">Signed up</option><option value="noShow">No show</option></select>
+    <textarea id="trialNotes" placeholder="Notes (optional)"></textarea>
+    <div class="dialog-actions">
+      <button class="danger" id="deleteTrialBtn" type="button" style="display:none;">Delete</button>
+      <button class="ghost" id="cancelTrial" type="button">Cancel</button>
+      <button class="primary" id="saveTrial" type="button">Save</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="howItWorksDialog">
+  <div class="dialog-inner">
+    <h3>How this works</h3>
+    <p style="font-size:13.5px; line-height:1.5; margin:0 0 10px; font-family:Inter,sans-serif;">Book a trial by clicking a slot in the grid — it saves straight away and everyone who opens this page sees it within a few seconds, no save button needed. The grid shows the current week; use Prev/Next to flip weeks. Once a trial's date has passed, it drops into "Needs follow-up" until someone marks it Signed up or No show. About an hour before each trial (5pm the day before for 5am classes), a reminder email goes to the studio inbox with who's coming, for what class, and with which coach. The "Copy text reminders" tab gives you a ready-made text for every upcoming trial — tap Copy text and paste it into Messages to remind the trialist yourself.</p>
+    <div class="dialog-actions">
+      <button class="primary" id="closeHowItWorks" type="button">Got it</button>
+    </div>
+  </div>
+</dialog>
+
+<script>
+(function(){
+  "use strict";
+  var API_URL = 'https://script.google.com/macros/s/AKfycbxaFlnSvkYQS8qGx7F4gX0JrKewkqlkz_M9MnVnCce4m5797CD12tzWy-q_NmaJsEP4/exec';
+  var DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+
+  function todayStr(d){ d = d || new Date(); var y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0'); return y+'-'+m+'-'+day; }
+  function escapeHtml(s){ return (s==null?'':String(s)).replace(/[&<>]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]; }); }
+  function el(html){ var t=document.createElement('template'); t.innerHTML=html.trim(); return t.content.firstElementChild; }
+  function mondayOf(d){ var x=new Date(d); var dow=x.getDay(); var diff=(dow===0?-6:1-dow); x.setDate(x.getDate()+diff); x.setHours(0,0,0,0); return x; }
+  function addDays(d,n){ var x=new Date(d); x.setDate(x.getDate()+n); return x; }
+  function parseDateTime(dateStr, timeStr){
+    var dp = (dateStr||'1970-01-01').split('-').map(Number);
+    var tp = (timeStr||'0:0').split(':').map(Number);
+    return new Date(dp[0], (dp[1]||1)-1, dp[2]||1, tp[0]||0, tp[1]||0, 0, 0);
+  }
+  function computeReminderAt(dateStr, timeStr){
+    var dt = parseDateTime(dateStr, timeStr);
+    var hour = parseInt((timeStr||'0:0').split(':')[0], 10) || 0;
+    var reminderDt;
+    if(hour < 6){ reminderDt = addDays(dt, -1); reminderDt.setHours(17,0,0,0); }
+    else { reminderDt = new Date(dt.getTime() - 60*60*1000); }
+    return reminderDt.getTime();
+  }
+  function formatTime(t){
+    if(!t) return '';
+    var p = t.split(':'); var h = parseInt(p[0],10), m = p[1]||'00';
+    var ap = h>=12?'PM':'AM'; var h12 = h%12; if(h12===0) h12=12;
+    return h12+':'+m+' '+ap;
+  }
+  function dayLabel(dateStr){
+    var d = parseDateTime(dateStr,'0:0');
+    var today = todayStr(); var tomorrow = todayStr(addDays(new Date(),1));
+    var prefix = dateStr===today ? 'Today' : (dateStr===tomorrow ? 'Tomorrow' : DAY_NAMES[d.getDay()]);
+    return prefix + ' · ' + d.toLocaleDateString(undefined,{day:'numeric',month:'short'});
+  }
+  function buildReminderText(t){
+    var d = parseDateTime(t.date,'0:0');
+    var today = todayStr(); var tomorrow = todayStr(addDays(new Date(),1));
+    var when = t.date===today ? 'today' : (t.date===tomorrow ? 'tomorrow' : 'on '+DAY_NAMES[d.getDay()]);
+    return 'Hi '+t.name+'! Just a reminder your trial class at Studio Thirty is '+when+' at '+formatTime(t.time||'')+(t.className?' ('+t.className+')':'')+'. See you then! - S30 Papamoa';
+  }
+  function fallbackCopy(text, done){
+    try{
+      var ta = document.createElement('textarea');
+      ta.value = text; ta.style.position='fixed'; ta.style.opacity='0'; ta.style.top='0'; ta.style.left='0';
+      document.body.appendChild(ta); ta.focus(); ta.select();
+      var ok = document.execCommand('copy');
+      document.body.removeChild(ta);
+      done(ok);
+    }catch(e){ done(false); }
+  }
+  function copyToClipboard(text, btn){
+    var original = btn.textContent;
+    function done(ok){
+      btn.textContent = ok ? 'Copied!' : 'Copy failed';
+      setTimeout(function(){ btn.textContent = original; }, 1500);
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){ done(true); }).catch(function(){ fallbackCopy(text, done); });
+    } else {
+      fallbackCopy(text, done);
+    }
+  }
+
+  /* ---------- backend: Google Apps Script Web App over the Trials sheet ---------- */
+  function apiGet(){
+    return fetch(API_URL, {cache:'no-store'}).then(function(r){ if(!r.ok) throw new Error('http_'+r.status); return r.json(); });
+  }
+  function apiPost(payload){
+    return fetch(API_URL, {
+      method:'POST',
+      headers:{'Content-Type':'text/plain;charset=utf-8'}, // avoids a CORS preflight against Apps Script
+      body: JSON.stringify(payload)
+    }).then(function(r){ if(!r.ok) throw new Error('http_'+r.status); return r.json(); });
+  }
+
+  var state = { trials: [] };
+  var loaded = false;
+  var loadFailed = false;
+  var weekStart = mondayOf(new Date());
+  var editingId = null;
+  var pollTimer = null;
+
+  document.getElementById('howItWorksBtn').addEventListener('click', function(){ document.getElementById('howItWorksDialog').showModal(); });
+  document.getElementById('closeHowItWorks').addEventListener('click', function(){ document.getElementById('howItWorksDialog').close(); });
+
+  function weekTrials(){
+    var start = weekStart, end = addDays(start,7);
+    return state.trials.filter(function(t){
+      if(!t.date) return false;
+      var d = parseDateTime(t.date, t.time||'0:0');
+      return d >= start && d < end;
+    });
+  }
+
+  function render(){
+    document.getElementById('weekLabel').textContent =
+      weekStart.toLocaleDateString(undefined,{day:'numeric',month:'short'}) + ' – ' + addDays(weekStart,6).toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'});
+
+    var holder = document.getElementById('gridHolder');
+    if(loaded){
+      var items = weekTrials();
+      var times = [];
+      items.forEach(function(t){ var tm = t.time||'0:0'; if(times.indexOf(tm) === -1) times.push(tm); });
+      times.sort();
+      var todayS = todayStr();
+      var grid = el('<div class="trial-grid"></div>');
+      grid.appendChild(el('<div class="tg-head"></div>'));
+      for(var i=0;i<7;i++){
+        var day = addDays(weekStart,i);
+        var isToday = todayStr(day) === todayS;
+        grid.appendChild(el('<div class="tg-head'+(isToday?' is-today':'')+'">'+DAY_NAMES[day.getDay()].slice(0,3)+'<span class="dnum">'+day.getDate()+'</span></div>'));
+      }
+      if(times.length === 0){
+        grid.appendChild(el('<div class="tg-empty">No trials booked this week yet — click "Book a trial" to add one, or click straight into a day column below.</div>'));
+        for(var e=0;e<7;e++){
+          (function(e){
+            var day = addDays(weekStart,e);
+            var ds = todayStr(day);
+            var cell = el('<div class="tg-cell"></div>');
+            cell.addEventListener('click', function(){ openDialog(null, ds, ''); });
+            grid.appendChild(cell);
+          })(e);
+        }
+      } else {
+        times.forEach(function(time){
+          grid.appendChild(el('<div class="tg-time">'+formatTime(time)+'</div>'));
+          for(var i=0;i<7;i++){
+            (function(i){
+              var day = addDays(weekStart,i);
+              var ds = todayStr(day);
+              var cell = el('<div class="tg-cell"></div>');
+              items.filter(function(t){ return (t.time||'0:0')===time && t.date===ds; }).forEach(function(t){
+                var cls = t.status==='signedUp' ? 'signedUp' : (t.status==='noShow' ? 'noShow' : '');
+                var chip = el('<button type="button" class="chip '+cls+'"></button>');
+                chip.textContent = t.name + (t.status==='noShow' ? ' (no show)' : '');
+                chip.addEventListener('click', function(e){ e.stopPropagation(); openDialog(t); });
+                cell.appendChild(chip);
+              });
+              cell.addEventListener('click', function(){ openDialog(null, ds, time==='0:0' ? '' : time); });
+              grid.appendChild(cell);
+            })(i);
+          }
+        });
+      }
+      holder.innerHTML = '';
+      var scroll = el('<div class="grid-scroll"></div>');
+      scroll.appendChild(grid);
+      holder.appendChild(scroll);
+    }
+
+    var fHolder = document.getElementById('followupList');
+    if(loaded){
+      var todayS2 = todayStr();
+      var followups = state.trials.filter(function(t){ return t.date && t.date < todayS2 && t.status === 'booked'; })
+        .sort(function(a,b){ return (b.date+(b.time||'')).localeCompare(a.date+(a.time||'')); });
+      if(followups.length === 0){
+        fHolder.innerHTML = '<div class="empty">Nothing waiting on a follow-up.</div>';
+      } else {
+        var wrap = document.createElement('div');
+        var lastDay = null;
+        followups.forEach(function(t){
+          if(t.date !== lastDay){
+            wrap.appendChild(el('<div class="daylabel">'+escapeHtml(dayLabel(t.date))+'</div>'));
+            lastDay = t.date;
+          }
+          var card = el('<div class="pcard"></div>');
+          var main = el('<div class="main"></div>');
+          main.innerHTML =
+            '<div class="t"></div>'+
+            (t.coach ? '<div class="meta">Coach: '+escapeHtml(t.coach)+'</div>' : '')+
+            (t.notes ? '<span class="lbl">Notes</span><div class="notebody"></div>' : '');
+          main.querySelector('.t').textContent = t.name;
+          if(t.notes) main.querySelector('.notebody').textContent = t.notes;
+          main.addEventListener('click', function(){ openDialog(t); });
+          card.appendChild(main);
+          var side = el('<div class="side"></div>');
+          var timeTag = el('<span class="tag"></span>'); timeTag.textContent = formatTime(t.time||'');
+          side.appendChild(timeTag);
+          var btns = el('<div class="rowbtns"></div>');
+          var su = el('<button class="ghost small" type="button">Signed up</button>');
+          su.addEventListener('click', function(e){ e.stopPropagation(); quickUpdate(t.id, {status:'signedUp'}); });
+          var ns = el('<button class="ghost small" type="button">No show</button>');
+          ns.addEventListener('click', function(e){ e.stopPropagation(); quickUpdate(t.id, {status:'noShow'}); });
+          btns.appendChild(su); btns.appendChild(ns);
+          side.appendChild(btns);
+          card.appendChild(side);
+          card.addEventListener('click', function(){ openDialog(t); });
+          wrap.appendChild(card);
+        });
+        fHolder.innerHTML = ''; fHolder.appendChild(wrap);
+      }
+    }
+
+    renderTextTab();
+  }
+
+  function quickUpdate(id, data){
+    apiPost({action:'update', id:id, data:data}).then(loadTrials).catch(function(err){ console.error(err); loadTrials(); });
+  }
+
+  function renderTextTab(){
+    var holder = document.getElementById('textRemindersList');
+    if(!loaded) return;
+    var todayS = todayStr();
+    var upcoming = state.trials.filter(function(t){ return t.date && t.date >= todayS && t.status === 'booked'; })
+      .sort(function(a,b){ return (a.date+(a.time||'')).localeCompare(b.date+(b.time||'')); });
+    if(upcoming.length === 0){
+      holder.innerHTML = '<div class="empty">No upcoming trials to text yet.</div>';
+      return;
+    }
+    var wrap = document.createElement('div');
+    upcoming.forEach(function(t){
+      var card = el('<div class="tcard"></div>');
+      var head = el('<div class="t"></div>'); head.textContent = t.name;
+      card.appendChild(head);
+      var meta = el('<div class="meta"></div>');
+      meta.textContent = dayLabel(t.date) + ' · ' + formatTime(t.time||'') + (t.className ? ' · '+t.className : '');
+      card.appendChild(meta);
+      var phone = el('<div class="phone"></div>');
+      phone.textContent = t.phone ? ('Phone: '+t.phone) : 'No phone on file';
+      if(!t.phone) phone.style.color = 'var(--muted)';
+      card.appendChild(phone);
+      var msgText = buildReminderText(t);
+      var box = el('<div class="msgbox"></div>'); box.textContent = msgText;
+      card.appendChild(box);
+      var row = el('<div class="trow"></div>');
+      var copyMsgBtn = el('<button class="ghost small" type="button">Copy text</button>');
+      copyMsgBtn.addEventListener('click', function(){ copyToClipboard(msgText, copyMsgBtn); });
+      row.appendChild(copyMsgBtn);
+      if(t.phone){
+        var copyPhoneBtn = el('<button class="ghost small" type="button">Copy number</button>');
+        copyPhoneBtn.addEventListener('click', function(){ copyToClipboard(t.phone, copyPhoneBtn); });
+        row.appendChild(copyPhoneBtn);
+      }
+      card.appendChild(row);
+      wrap.appendChild(card);
+    });
+    holder.innerHTML = ''; holder.appendChild(wrap);
+  }
+
+  document.querySelectorAll('.tabbtn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      document.querySelectorAll('.tabbtn').forEach(function(b){ b.classList.remove('active'); });
+      btn.classList.add('active');
+      var tab = btn.getAttribute('data-tab');
+      document.getElementById('tab-board').hidden = tab !== 'board';
+      document.getElementById('tab-texts').hidden = tab !== 'texts';
+      if(tab === 'texts') renderTextTab();
+    });
+  });
+
+  function openDialog(trial, prefillDate, prefillTime){
+    editingId = trial ? trial.id : null;
+    document.getElementById('trialDialogTitle').textContent = trial ? 'Edit trial' : 'Book a trial';
+    document.getElementById('trialName').value = trial ? (trial.name||'') : '';
+    document.getElementById('trialPhone').value = trial ? (trial.phone||'') : '';
+    document.getElementById('trialDate').value = trial ? trial.date : (prefillDate || todayStr());
+    document.getElementById('trialTime').value = trial ? (trial.time||'') : (prefillTime || '');
+    document.getElementById('trialClass').value = trial ? (trial.className||'') : '';
+    document.getElementById('trialCoach').value = trial ? (trial.coach||'') : '';
+    document.getElementById('trialStatus').value = trial ? (trial.status||'booked') : 'booked';
+    document.getElementById('trialNotes').value = trial ? (trial.notes||'') : '';
+    document.getElementById('deleteTrialBtn').style.display = trial ? '' : 'none';
+    document.getElementById('trialDialog').showModal();
+  }
+  document.getElementById('addTrialBtn').addEventListener('click', function(){ openDialog(null, todayStr(), ''); });
+  document.getElementById('cancelTrial').addEventListener('click', function(){ document.getElementById('trialDialog').close(); });
+  document.getElementById('deleteTrialBtn').addEventListener('click', function(){
+    if(editingId && confirm('Delete this trial?')){
+      var id = editingId;
+      document.getElementById('trialDialog').close();
+      apiPost({action:'delete', id:id}).then(loadTrials).catch(function(err){ console.error(err); loadTrials(); });
+    }
+  });
+  document.getElementById('saveTrial').addEventListener('click', function(){
+    var name = document.getElementById('trialName').value.trim();
+    var date = document.getElementById('trialDate').value;
+    var time = document.getElementById('trialTime').value;
+    if(!name || !date || !time) return;
+    var data = {
+      name: name,
+      phone: document.getElementById('trialPhone').value.trim(),
+      date: date, time: time,
+      className: document.getElementById('trialClass').value.trim(),
+      coach: document.getElementById('trialCoach').value.trim(),
+      status: document.getElementById('trialStatus').value,
+      notes: document.getElementById('trialNotes').value.trim(),
+      reminderAt: computeReminderAt(date, time)
+    };
+    var isEdit = !!editingId;
+    var id = editingId;
+    if(isEdit){
+      var existing = state.trials.find(function(x){ return x.id === id; });
+      if((!existing || existing.reminderAt !== data.reminderAt) && data.reminderAt > Date.now()){ data.reminderSent = false; }
+    } else {
+      data.reminderSent = false;
+    }
+    document.getElementById('trialDialog').close();
+    var req = isEdit ? apiPost({action:'update', id:id, data:data}) : apiPost({action:'add', data:data});
+    req.then(loadTrials).catch(function(err){ console.error(err); loadTrials(); });
+  });
+  document.getElementById('prevWeek').addEventListener('click', function(){ weekStart = addDays(weekStart,-7); render(); });
+  document.getElementById('nextWeek').addEventListener('click', function(){ weekStart = addDays(weekStart,7); render(); });
+
+  function loadTrials(){
+    return apiGet().then(function(data){
+      loaded = true;
+      loadFailed = false;
+      document.getElementById('globalError').hidden = true;
+      state.trials = (data && data.trials) || [];
+      render();
+    }).catch(function(err){
+      console.error(err);
+      loadFailed = true;
+      if(!loaded){
+        document.getElementById('gridHolder').innerHTML = '<div class="empty">Couldn\'t load the board. Check your connection and refresh.</div>';
+        document.getElementById('followupList').innerHTML = '';
+      } else {
+        document.getElementById('globalError').hidden = false;
+      }
+    });
+  }
+
+  function startPolling(){
+    if(pollTimer) clearInterval(pollTimer);
+    pollTimer = setInterval(loadTrials, 20000);
+  }
+  document.addEventListener('visibilitychange', function(){ if(!document.hidden) loadTrials(); });
+
+  render();
+  loadTrials();
+  startPolling();
+})();
+</script>
+
+</body></html>
