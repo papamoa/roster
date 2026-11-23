@@ -191,7 +191,6 @@ body.locked .wrap{display:none}
 <button class="ptab" data-p="workouts">Workouts</button>
 <button class="ptab" data-p="milestones">250 / 500 Club <span class="n" id="n-milestones"></span></button>
 <button class="ptab" data-p="newbies">New Members <span class="n" id="n-newbies"></span></button>
-<button class="ptab" data-p="trials">Trials <span class="n" id="n-trials"></span></button>
 <button class="ptab" data-p="notices">Team Notices <span class="n" id="n-notices"></span></button>
 <button class="ptab" data-p="trouble">Troubleshooting <span class="n" id="n-trouble"></span></button>
 <button class="ptab" data-p="passwords">Passwords</button>
@@ -208,7 +207,6 @@ body.locked .wrap{display:none}
 <main id="out"><div class="msg">Loading roster...</div></main>
 </section>
 <section class="panel" id="pn-workouts" hidden><h2 class="ph">This Week's <em>Workouts</em></h2><p class="pdesc">Pulled straight from the programming sheet. Flips over to the new week automatically from Sunday.</p><div id="pl-workouts"><div class="msg">Loading workouts...</div></div></section>
-<section class="panel" id="pn-trials" hidden><h2 class="ph">Upcoming <em>Trials</em></h2><p class="pdesc">New people coming in for a trial. Learn their name, give them a warm welcome and look after them in class.</p><div class="plist" id="pl-trials"></div></section>
 <section class="panel" id="pn-notices" hidden><h2 class="ph">Team <em>Notices</em></h2><p class="pdesc">What's happening in the studio. Newest at the top.</p><div class="plist" id="pl-notices"></div></section>
 <section class="panel" id="pn-milestones" hidden><h2 class="ph">250 / 500 <em>Club</em></h2><p class="pdesc">Members about to hit (or who just hit) a big milestone. Give them a shout-out!</p><div class="plist" id="pl-milestones"></div></section>
 <section class="panel" id="pn-newbies" hidden><h2 class="ph">New <em>Members</em></h2><p class="pdesc">New faces to look out for in class. Say hi, learn their name, check their technique.</p><div class="plist" id="pl-newbies"></div></section>
@@ -367,7 +365,7 @@ document.addEventListener('visibilitychange',function(){ if(!document.hidden) lo
 var SHEET='1JVCmSv-PZV6_xcdvxiri5eH5lNe6EoB_MKBkPZnsaxs';
 var PIN_HASH='4b19cfb4e7b76356c66320ef5e21a45f3e5ccb8236c50a60a1be2b32df2d1a64';
 var KEY='s30-portal-ok';
-var TABMAP={trials:'Trials',notices:'Notices',milestones:'Milestones',newbies:'New Members',trouble:'Troubleshooting',passwords:'Passwords'};
+var TABMAP={notices:'Notices',milestones:'Milestones',newbies:'New Members',trouble:'Troubleshooting',passwords:'Passwords'};
 var loaded={};
 
 /* ---------- PIN gate ---------- */
@@ -506,7 +504,7 @@ function load(id,force){
     if(!rows.length) count(id,0);
   }).catch(function(){ loaded[id]=false; box.innerHTML='<div class="empty">Couldn\'t load this tab. Check the <b>'+esc(TABMAP[id])+'</b> tab exists in the roster sheet, then refresh.</div>'; });
 }
-function preload(){ ['trials','milestones','newbies','notices','trouble'].forEach(function(id){ load(id); }); }
+function preload(){ ['milestones','newbies','notices','trouble'].forEach(function(id){ load(id); }); }
 
 /* ---------- password buttons ---------- */
 document.addEventListener('click',function(e){
