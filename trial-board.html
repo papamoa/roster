@@ -84,6 +84,19 @@ button.ghost.small{padding:5px 12px; font-size:11.5px;}
   background:var(--gold); color:#090909;}
 .chip.signedUp{background:#2f6e3e; color:#d7f0dc;}
 .chip.noShow{background:#2a2a2a; color:var(--muted); text-decoration:line-through;}
+.chip.keen{background:#e8892a; color:#090909;}
+.chip.notKeen{background:#3a3a3a; color:#bdb8ac;}
+.chip.secondBooked{background:#3d6fa3; color:#e6f0fb;}
+.n2{display:inline-block; background:#090909; color:var(--gold); font-size:10px; border-radius:4px; padding:0 4px; margin-left:4px; letter-spacing:.8px;}
+.chip.keen .n2,.chip.notKeen .n2,.chip.secondBooked .n2,.chip.signedUp .n2{background:rgba(0,0,0,.35);}
+.seg{display:flex; gap:8px; margin:6px 0;}
+.seg button{flex:1; padding:9px; border-radius:8px; border:1px solid #2a2a2a; background:#0d0d0d; color:var(--muted); font-family:"Barlow Condensed",sans-serif; font-weight:700; letter-spacing:1px; text-transform:uppercase; font-size:14px; cursor:pointer;}
+.seg button.on{background:var(--gold); color:#090909; border-color:var(--gold);}
+.lblsm{display:block; color:var(--gold); font-weight:700; font-size:11px; letter-spacing:1.4px; text-transform:uppercase; margin-top:10px;}
+.outs{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin:6px 0;}
+.outs button{padding:10px 6px; border-radius:8px; border:1px solid #2a2a2a; background:#0d0d0d; color:var(--cream); font-family:"Barlow Condensed",sans-serif; font-weight:700; letter-spacing:1px; text-transform:uppercase; font-size:14px; cursor:pointer;}
+.outs button.on{background:var(--gold); color:#090909; border-color:var(--gold);}
+.pcard .tag2{background:#090909; color:var(--gold); border:1px solid var(--gold);}
 
 /* ---------- trial cards (follow-up list), matching the real portal's card style ---------- */
 .pcard{background:var(--card); border-radius:12px; border-left:4px solid var(--gold); padding:14px 16px; margin-bottom:10px; display:flex; align-items:flex-start; gap:14px; cursor:pointer;}
@@ -183,7 +196,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);}
 
         <div class="block">
           <h2>Needs <span class="accent">follow-up</span></h2>
-          <div class="desc">Past trials nobody's marked as signed up or not yet — tick off the outcome so these clear.</div>
+          <div class="desc">Trials whose class has finished. Tap How did it go? to add notes and mark the outcome, or book their 2nd class. Keen ones stay here until they sign up.</div>
           <div id="followupList" class="skeleton"><div class="bar" style="width:50%"></div></div>
         </div>
       </div>
@@ -209,6 +222,8 @@ dialog::backdrop{background:rgba(0,0,0,.6);}
     <h3 id="trialDialogTitle">Book a trial</h3>
     <input type="text" id="trialName" placeholder="Name">
     <input type="text" id="trialPhone" placeholder="Phone (optional)">
+    <span class="lblsm">Which free class?</span>
+    <div class="seg" id="trialNoSeg"><button type="button" data-n="1">1st class</button><button type="button" data-n="2">2nd class</button></div>
     <div class="field-row">
       <input type="date" id="trialDate">
       <input type="time" id="trialTime">
@@ -217,12 +232,40 @@ dialog::backdrop{background:rgba(0,0,0,.6);}
       <input type="text" id="trialClass" placeholder="Class (optional)">
       <input type="text" id="trialCoach" placeholder="Coach (optional)">
     </div>
-    <select id="trialStatus"><option value="booked">Booked</option><option value="signedUp">Signed up</option><option value="noShow">No show</option></select>
+    <select id="trialStatus"><option value="booked">Booked</option><option value="secondBooked">Booked 2nd class</option><option value="keen">Keen, follow up</option><option value="signedUp">Signed up</option><option value="notKeen">Not keen</option><option value="noShow">No show</option></select>
     <textarea id="trialNotes" placeholder="Notes (optional)"></textarea>
+    <textarea id="trialClassNotes" placeholder="After class notes (how they found it, goals, anything to remember)"></textarea>
+    <button class="ghost" id="howWentBtn" type="button" style="width:100%; margin-top:4px;">Class done? How did it go ›</button>
     <div class="dialog-actions">
       <button class="danger" id="deleteTrialBtn" type="button" style="display:none;">Delete</button>
       <button class="ghost" id="cancelTrial" type="button">Cancel</button>
       <button class="primary" id="saveTrial" type="button">Save</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="doneDialog">
+  <div class="dialog-inner">
+    <h3>How did it go?</h3>
+    <div id="doneWho" style="color:var(--muted); font-size:13.5px; margin-bottom:6px;"></div>
+    <span class="lblsm">Notes from the class</span>
+    <textarea id="doneNotes" placeholder="How they found it, goals, injuries, anything to remember"></textarea>
+    <span class="lblsm">What happened?</span>
+    <div class="outs" id="doneOuts">
+      <button type="button" data-o="signedUp">Signed up 🎉</button>
+      <button type="button" data-o="secondBooked" id="doneSecondBtn">Booked 2nd class</button>
+      <button type="button" data-o="keen">Keen, follow up</button>
+      <button type="button" data-o="notKeen">Not keen</button>
+      <button type="button" data-o="noShow">No show</button>
+    </div>
+    <div id="doneNext" hidden>
+      <span class="lblsm">2nd class</span>
+      <div class="field-row"><input type="date" id="doneDate"><input type="time" id="doneTime"></div>
+      <input type="text" id="doneCoach" placeholder="Coach (optional)">
+    </div>
+    <div class="dialog-actions">
+      <button class="ghost" id="doneCancel" type="button">Cancel</button>
+      <button class="primary" id="doneSave" type="button">Save</button>
     </div>
   </div>
 </dialog>
@@ -273,11 +316,20 @@ dialog::backdrop{background:rgba(0,0,0,.6);}
     var prefix = dateStr===today ? 'Today' : (dateStr===tomorrow ? 'Tomorrow' : DAY_NAMES[d.getDay()]);
     return prefix + ' · ' + d.toLocaleDateString(undefined,{day:'numeric',month:'short'});
   }
+  function isSecond(t){ return String(t.trialNo||'')==='2'; }
+  function classOver(t){
+    if(!t.date) return false;
+    var today = todayStr();
+    if(t.date < today) return true;
+    if(t.date > today) return false;
+    return Date.now() >= parseDateTime(t.date, t.time||'0:0').getTime() + 45*60*1000;
+  }
+  var STATUS_LABEL = {booked:'Booked', secondBooked:'Booked 2nd class', keen:'Keen, follow up', signedUp:'Signed up', notKeen:'Not keen', noShow:'No show'};
   function buildReminderText(t){
     var d = parseDateTime(t.date,'0:0');
     var today = todayStr(); var tomorrow = todayStr(addDays(new Date(),1));
     var when = t.date===today ? 'today' : (t.date===tomorrow ? 'tomorrow' : 'on '+DAY_NAMES[d.getDay()]);
-    return 'Hi '+t.name+'! Just a reminder your trial class at Studio Thirty is '+when+' at '+formatTime(t.time||'')+(t.className?' ('+t.className+')':'')+'. See you then! - S30 Papamoa';
+    return 'Hi '+t.name+'! Just a reminder your '+(isSecond(t)?'2nd free ':'')+'trial class at Studio Thirty is '+when+' at '+formatTime(t.time||'')+(t.className?' ('+t.className+')':'')+'. See you then! - S30 Papamoa';
   }
   function fallbackCopy(text, done){
     try{
@@ -371,10 +423,12 @@ dialog::backdrop{background:rgba(0,0,0,.6);}
               var ds = todayStr(day);
               var cell = el('<div class="tg-cell"></div>');
               items.filter(function(t){ return (t.time||'0:0')===time && t.date===ds; }).forEach(function(t){
-                var cls = t.status==='signedUp' ? 'signedUp' : (t.status==='noShow' ? 'noShow' : '');
+                var cls = ['signedUp','noShow','keen','notKeen','secondBooked'].indexOf(t.status) > -1 ? t.status : '';
                 var chip = el('<button type="button" class="chip '+cls+'"></button>');
                 chip.textContent = t.name + (t.status==='noShow' ? ' (no show)' : '');
-                chip.addEventListener('click', function(e){ e.stopPropagation(); openDialog(t); });
+                if(isSecond(t)) chip.appendChild(el('<span class="n2">2ND</span>'));
+                chip.title = STATUS_LABEL[t.status] || '';
+                chip.addEventListener('click', function(e){ e.stopPropagation(); if(t.status==='booked' && classOver(t)) openDone(t); else openDialog(t); });
                 cell.appendChild(chip);
               });
               cell.addEventListener('click', function(){ openDialog(null, ds, time==='0:0' ? '' : time); });
@@ -392,7 +446,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);}
     var fHolder = document.getElementById('followupList');
     if(loaded){
       var todayS2 = todayStr();
-      var followups = state.trials.filter(function(t){ return t.date && t.date < todayS2 && t.status === 'booked'; })
+      var followups = state.trials.filter(function(t){ return (t.status === 'booked' && classOver(t)) || t.status === 'keen'; })
         .sort(function(a,b){ return (b.date+(b.time||'')).localeCompare(a.date+(a.time||'')); });
       if(followups.length === 0){
         fHolder.innerHTML = '<div class="empty">Nothing waiting on a follow-up.</div>';
@@ -411,21 +465,22 @@ dialog::backdrop{background:rgba(0,0,0,.6);}
             (t.coach ? '<div class="meta">Coach: '+escapeHtml(t.coach)+'</div>' : '')+
             (t.notes ? '<span class="lbl">Notes</span><div class="notebody"></div>' : '');
           main.querySelector('.t').textContent = t.name;
+          if(isSecond(t)) main.querySelector('.t').appendChild(el('<span class="n2">2ND</span>'));
+          if(t.status === 'keen') main.appendChild(el('<span class="lbl">Keen, follow up</span>'));
+          if(t.classNotes){ var cn = el('<div class="notebody"></div>'); cn.textContent = 'After class: '+t.classNotes; main.appendChild(cn); }
           if(t.notes) main.querySelector('.notebody').textContent = t.notes;
-          main.addEventListener('click', function(){ openDialog(t); });
+          main.addEventListener('click', function(e){ e.stopPropagation(); openDialog(t); });
           card.appendChild(main);
           var side = el('<div class="side"></div>');
           var timeTag = el('<span class="tag"></span>'); timeTag.textContent = formatTime(t.time||'');
           side.appendChild(timeTag);
           var btns = el('<div class="rowbtns"></div>');
-          var su = el('<button class="ghost small" type="button">Signed up</button>');
-          su.addEventListener('click', function(e){ e.stopPropagation(); quickUpdate(t.id, {status:'signedUp'}); });
-          var ns = el('<button class="ghost small" type="button">No show</button>');
-          ns.addEventListener('click', function(e){ e.stopPropagation(); quickUpdate(t.id, {status:'noShow'}); });
-          btns.appendChild(su); btns.appendChild(ns);
+          var hw = el('<button class="primary" type="button" style="padding:6px 14px; font-size:12.5px;">How did it go?</button>');
+          hw.addEventListener('click', function(e){ e.stopPropagation(); openDone(t); });
+          btns.appendChild(hw);
           side.appendChild(btns);
           card.appendChild(side);
-          card.addEventListener('click', function(){ openDialog(t); });
+          card.addEventListener('click', function(){ openDone(t); });
           wrap.appendChild(card);
         });
         fHolder.innerHTML = ''; fHolder.appendChild(wrap);
@@ -490,6 +545,55 @@ dialog::backdrop{background:rgba(0,0,0,.6);}
     });
   });
 
+  var trialNo = '1';
+  function setTrialNo(n){ trialNo = n; document.querySelectorAll('#trialNoSeg button').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-n')===n); }); }
+  document.querySelectorAll('#trialNoSeg button').forEach(function(b){ b.addEventListener('click', function(){ setTrialNo(b.getAttribute('data-n')); }); });
+  document.getElementById('howWentBtn').addEventListener('click', function(){
+    var t = state.trials.find(function(x){ return x.id === editingId; });
+    document.getElementById('trialDialog').close();
+    if(t) openDone(t);
+  });
+
+  var doneTrial = null, doneOut = '';
+  function setOut(o){
+    doneOut = o;
+    document.querySelectorAll('#doneOuts button').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-o')===o); });
+    document.getElementById('doneNext').hidden = o !== 'secondBooked';
+  }
+  document.querySelectorAll('#doneOuts button').forEach(function(b){ b.addEventListener('click', function(){ setOut(b.getAttribute('data-o')); }); });
+  function openDone(t){
+    doneTrial = t;
+    document.getElementById('doneWho').textContent = t.name + (isSecond(t) ? ' (2nd class)' : ' (1st class)') + ' · ' + dayLabel(t.date) + ' · ' + formatTime(t.time||'') + (t.coach ? ' · '+t.coach : '');
+    document.getElementById('doneNotes').value = t.classNotes || '';
+    document.getElementById('doneSecondBtn').style.display = isSecond(t) ? 'none' : '';
+    var nd = addDays(parseDateTime(t.date,'0:0'), 2);
+    document.getElementById('doneDate').value = todayStr(nd);
+    document.getElementById('doneTime').value = t.time || '';
+    document.getElementById('doneCoach').value = '';
+    setOut('');
+    document.getElementById('doneDialog').showModal();
+  }
+  document.getElementById('doneCancel').addEventListener('click', function(){ document.getElementById('doneDialog').close(); });
+  document.getElementById('doneSave').addEventListener('click', function(){
+    if(!doneTrial) return;
+    if(!doneOut){ alert('Pick what happened.'); return; }
+    var t = doneTrial, notes = document.getElementById('doneNotes').value.trim();
+    var reqs = [];
+    if(doneOut === 'secondBooked'){
+      var d2 = document.getElementById('doneDate').value, t2 = document.getElementById('doneTime').value;
+      if(!d2 || !t2){ alert('Pick a date and time for the 2nd class.'); return; }
+      reqs.push(apiPost({action:'add', data:{
+        name: t.name, phone: t.phone||'', date: d2, time: t2, className: t.className||'',
+        coach: document.getElementById('doneCoach').value.trim(), status: 'booked',
+        notes: notes ? 'From 1st class: '+notes : (t.notes||''), trialNo: '2', classNotes: '',
+        reminderAt: computeReminderAt(d2, t2), reminderSent: false
+      }}));
+    }
+    reqs.push(apiPost({action:'update', id:t.id, data:{status: doneOut, classNotes: notes}}));
+    document.getElementById('doneDialog').close();
+    Promise.all(reqs).then(loadTrials).catch(function(err){ console.error(err); loadTrials(); });
+  });
+
   function openDialog(trial, prefillDate, prefillTime){
     editingId = trial ? trial.id : null;
     document.getElementById('trialDialogTitle').textContent = trial ? 'Edit trial' : 'Book a trial';
@@ -501,6 +605,9 @@ dialog::backdrop{background:rgba(0,0,0,.6);}
     document.getElementById('trialCoach').value = trial ? (trial.coach||'') : '';
     document.getElementById('trialStatus').value = trial ? (trial.status||'booked') : 'booked';
     document.getElementById('trialNotes').value = trial ? (trial.notes||'') : '';
+    document.getElementById('trialClassNotes').value = trial ? (trial.classNotes||'') : '';
+    setTrialNo(trial && isSecond(trial) ? '2' : '1');
+    document.getElementById('howWentBtn').style.display = trial ? '' : 'none';
     document.getElementById('deleteTrialBtn').style.display = trial ? '' : 'none';
     document.getElementById('trialDialog').showModal();
   }
@@ -526,6 +633,8 @@ dialog::backdrop{background:rgba(0,0,0,.6);}
       coach: document.getElementById('trialCoach').value.trim(),
       status: document.getElementById('trialStatus').value,
       notes: document.getElementById('trialNotes').value.trim(),
+      classNotes: document.getElementById('trialClassNotes').value.trim(),
+      trialNo: trialNo,
       reminderAt: computeReminderAt(date, time)
     };
     var isEdit = !!editingId;
