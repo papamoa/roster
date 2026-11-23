@@ -88,6 +88,7 @@ button.ghost.small{padding:5px 12px; font-size:11.5px;}
 .chip.notKeen{background:#3a3a3a; color:#bdb8ac;}
 .chip.secondBooked{background:#3d6fa3; color:#e6f0fb;}
 .chip.classPass{background:#5b4a8a; color:#ece6ff;}
+.chip.rebooked{background:#2a2a2a; color:var(--muted);}
 .n2{display:inline-block; background:#090909; color:var(--gold); font-size:10px; border-radius:4px; padding:0 4px; margin-left:4px; letter-spacing:.8px;}
 .chip.keen .n2,.chip.notKeen .n2,.chip.secondBooked .n2,.chip.signedUp .n2{background:rgba(0,0,0,.35);}
 .seg{display:flex; gap:8px; margin:6px 0;}
@@ -196,9 +197,21 @@ dialog::backdrop{background:rgba(0,0,0,.6);}
         </div>
 
         <div class="block">
-          <h2>Needs <span class="accent">follow-up</span></h2>
-          <div class="desc">Trials whose class has finished. Tap How did it go? to add notes and mark the outcome, or book their 2nd class. Keen ones stay here until they sign up.</div>
+          <h2>How did <span class="accent">it go?</span></h2>
+          <div class="desc">Trials whose class has finished. Tap How did it go? to add notes and pick what happened. Keen ones move to Keen follow up and no-shows move to No shows below.</div>
           <div id="followupList" class="skeleton"><div class="bar" style="width:50%"></div></div>
+        </div>
+
+        <div class="block">
+          <h2>Keen <span class="accent">follow up</span></h2>
+          <div class="desc">They liked it but haven't signed up yet. Give them a call or text, then tap Signed up or Not keen. Tap the card to add notes or book their 2nd class.</div>
+          <div id="keenList"><div class="empty">Loading…</div></div>
+        </div>
+
+        <div class="block">
+          <h2>No <span class="accent">shows</span></h2>
+          <div class="desc">Didn't make it to their trial. Tap Rebook to put them into another class (it clears them from here), or Not interested.</div>
+          <div id="noShowList"><div class="empty">Loading…</div></div>
         </div>
       </div>
 
@@ -233,7 +246,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);}
       <input type="text" id="trialClass" placeholder="Class (optional)">
       <input type="text" id="trialCoach" placeholder="Coach (optional)">
     </div>
-    <select id="trialStatus"><option value="booked">Booked</option><option value="secondBooked">Booked 2nd class</option><option value="keen">Keen, follow up</option><option value="signedUp">Signed up</option><option value="notKeen">Not keen</option><option value="noShow">No show</option><option value="classPass">ClassPass, no follow up</option></select>
+    <select id="trialStatus"><option value="booked">Booked</option><option value="secondBooked">Booked 2nd class</option><option value="keen">Keen, follow up</option><option value="signedUp">Signed up</option><option value="notKeen">Not keen</option><option value="noShow">No show</option><option value="classPass">ClassPass, no follow up</option><option value="rebooked">Rebooked</option></select>
     <textarea id="trialNotes" placeholder="Notes (optional)"></textarea>
     <textarea id="trialClassNotes" placeholder="After class notes (how they found it, goals, anything to remember)"></textarea>
     <button class="ghost" id="howWentBtn" type="button" style="width:100%; margin-top:4px;">Class done? How did it go ›</button>
@@ -326,7 +339,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);}
     if(t.date > today) return false;
     return Date.now() >= parseDateTime(t.date, t.time||'0:0').getTime() + 45*60*1000;
   }
-  var STATUS_LABEL = {booked:'Booked', secondBooked:'Booked 2nd class', keen:'Keen, follow up', signedUp:'Signed up', notKeen:'Not keen', noShow:'No show', classPass:'ClassPass, no follow up'};
+  var STATUS_LABEL = {booked:'Booked', secondBooked:'Booked 2nd class', keen:'Keen, follow up', signedUp:'Signed up', notKeen:'Not keen', noShow:'No show', classPass:'ClassPass, no follow up', rebooked:'Rebooked'};
   function buildReminderText(t){
     var d = parseDateTime(t.date,'0:0');
     var today = todayStr(); var tomorrow = todayStr(addDays(new Date(),1));
@@ -425,7 +438,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);}
               var ds = todayStr(day);
               var cell = el('<div class="tg-cell"></div>');
               items.filter(function(t){ return (t.time||'0:0')===time && t.date===ds; }).forEach(function(t){
-                var cls = ['signedUp','noShow','keen','notKeen','secondBooked','classPass'].indexOf(t.status) > -1 ? t.status : '';
+                var cls = ['signedUp','noShow','keen','notKeen','secondBooked','classPass','rebooked'].indexOf(t.status) > -1 ? t.status : '';
                 var chip = el('<button type="button" class="chip '+cls+'"></button>');
                 chip.textContent = t.name + (t.status==='noShow' ? ' (no show)' : '');
                 if(isSecond(t)) chip.appendChild(el('<span class="n2">2ND</span>'));
@@ -445,51 +458,77 @@ dialog::backdrop{background:rgba(0,0,0,.6);}
       holder.appendChild(scroll);
     }
 
-    var fHolder = document.getElementById('followupList');
     if(loaded){
-      var todayS2 = todayStr();
-      var followups = state.trials.filter(function(t){ return (t.status === 'booked' && classOver(t)) || t.status === 'keen'; })
-        .sort(function(a,b){ return (b.date+(b.time||'')).localeCompare(a.date+(a.time||'')); });
-      if(followups.length === 0){
-        fHolder.innerHTML = '<div class="empty">Nothing waiting on a follow-up.</div>';
-      } else {
-        var wrap = document.createElement('div');
-        var lastDay = null;
-        followups.forEach(function(t){
-          if(t.date !== lastDay){
-            wrap.appendChild(el('<div class="daylabel">'+escapeHtml(dayLabel(t.date))+'</div>'));
-            lastDay = t.date;
-          }
-          var card = el('<div class="pcard"></div>');
-          var main = el('<div class="main"></div>');
-          main.innerHTML =
-            '<div class="t"></div>'+
-            (t.coach ? '<div class="meta">Coach: '+escapeHtml(t.coach)+'</div>' : '')+
-            (t.notes ? '<span class="lbl">Notes</span><div class="notebody"></div>' : '');
-          main.querySelector('.t').textContent = t.name;
-          if(isSecond(t)) main.querySelector('.t').appendChild(el('<span class="n2">2ND</span>'));
-          if(t.status === 'keen') main.appendChild(el('<span class="lbl">Keen, follow up</span>'));
-          if(t.classNotes){ var cn = el('<div class="notebody"></div>'); cn.textContent = 'After class: '+t.classNotes; main.appendChild(cn); }
-          if(t.notes) main.querySelector('.notebody').textContent = t.notes;
-          main.addEventListener('click', function(e){ e.stopPropagation(); openDialog(t); });
-          card.appendChild(main);
-          var side = el('<div class="side"></div>');
-          var timeTag = el('<span class="tag"></span>'); timeTag.textContent = formatTime(t.time||'');
-          side.appendChild(timeTag);
-          var btns = el('<div class="rowbtns"></div>');
-          var hw = el('<button class="primary" type="button" style="padding:6px 14px; font-size:12.5px;">How did it go?</button>');
-          hw.addEventListener('click', function(e){ e.stopPropagation(); openDone(t); });
-          btns.appendChild(hw);
-          side.appendChild(btns);
-          card.appendChild(side);
-          card.addEventListener('click', function(){ openDone(t); });
-          wrap.appendChild(card);
-        });
-        fHolder.innerHTML = ''; fHolder.appendChild(wrap);
-      }
+      var byNewest = function(a,b){ return (b.date+(b.time||'')).localeCompare(a.date+(a.time||'')); };
+      renderList('followupList',
+        state.trials.filter(function(t){ return t.status === 'booked' && classOver(t); }).sort(byNewest),
+        'Nothing waiting. Trials land here once their class has finished.',
+        function(t){ return [['How did it go?', true, function(){ openDone(t); }]]; },
+        function(t){ openDone(t); });
+      renderList('keenList',
+        state.trials.filter(function(t){ return t.status === 'keen'; }).sort(byNewest),
+        'No one to follow up right now.',
+        function(t){ return [
+          ['Signed up', true, function(){ quickUpdate(t.id, {status:'signedUp'}); }],
+          ['Not keen', false, function(){ quickUpdate(t.id, {status:'notKeen'}); }]
+        ]; },
+        function(t){ openDone(t); });
+      renderList('noShowList',
+        state.trials.filter(function(t){ return t.status === 'noShow'; }).sort(byNewest),
+        'No no-shows to chase.',
+        function(t){ return [
+          ['Rebook', true, function(){ rebook(t); }],
+          ['Not interested', false, function(){ quickUpdate(t.id, {status:'notKeen'}); }]
+        ]; },
+        function(t){ openDialog(t); });
     }
 
     renderTextTab();
+  }
+
+  function renderList(holderId, items, emptyMsg, btnsFn, clickFn){
+    var holder = document.getElementById(holderId);
+    if(items.length === 0){ holder.innerHTML = '<div class="empty">'+emptyMsg+'</div>'; return; }
+    var wrap = document.createElement('div');
+    var lastDay = null;
+    items.forEach(function(t){
+      if(t.date !== lastDay){ wrap.appendChild(el('<div class="daylabel">'+escapeHtml(dayLabel(t.date))+'</div>')); lastDay = t.date; }
+      var card = el('<div class="pcard"></div>');
+      var main = el('<div class="main"><div class="t"></div></div>');
+      main.querySelector('.t').textContent = t.name;
+      if(isSecond(t)) main.querySelector('.t').appendChild(el('<span class="n2">2ND</span>'));
+      var meta = [t.phone, t.coach ? 'Coach: '+t.coach : ''].filter(Boolean).join(' · ');
+      if(meta){ var m = el('<div class="meta"></div>'); m.textContent = meta; main.appendChild(m); }
+      if(t.notes){ main.appendChild(el('<span class="lbl">Notes</span>')); var nb = el('<div class="notebody"></div>'); nb.textContent = t.notes; main.appendChild(nb); }
+      if(t.classNotes){ main.appendChild(el('<span class="lbl">After class</span>')); var cb = el('<div class="notebody"></div>'); cb.textContent = t.classNotes; main.appendChild(cb); }
+      card.appendChild(main);
+      var side = el('<div class="side"></div>');
+      var timeTag = el('<span class="tag"></span>'); timeTag.textContent = formatTime(t.time||'');
+      side.appendChild(timeTag);
+      var btns = el('<div class="rowbtns"></div>');
+      btnsFn(t).forEach(function(b){
+        var bt = el('<button type="button" class="'+(b[1] ? 'primary' : 'ghost small')+'"'+(b[1] ? ' style="padding:6px 14px; font-size:12.5px;"' : '')+'></button>');
+        bt.textContent = b[0];
+        bt.addEventListener('click', function(e){ e.stopPropagation(); b[2](); });
+        btns.appendChild(bt);
+      });
+      side.appendChild(btns);
+      card.appendChild(side);
+      card.addEventListener('click', function(){ clickFn(t); });
+      wrap.appendChild(card);
+    });
+    holder.innerHTML = ''; holder.appendChild(wrap);
+  }
+
+  var rebookFrom = null;
+  function rebook(t){
+    openDialog(null, todayStr(addDays(new Date(),1)), '');
+    rebookFrom = t.id;
+    document.getElementById('trialDialogTitle').textContent = 'Rebook ' + t.name;
+    document.getElementById('trialName').value = t.name || '';
+    document.getElementById('trialPhone').value = t.phone || '';
+    document.getElementById('trialNotes').value = t.notes || '';
+    setTrialNo(isSecond(t) ? '2' : '1');
   }
 
   function quickUpdate(id, data){
@@ -597,6 +636,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);}
   });
 
   function openDialog(trial, prefillDate, prefillTime){
+    rebookFrom = null;
     editingId = trial ? trial.id : null;
     document.getElementById('trialDialogTitle').textContent = trial ? 'Edit trial' : 'Book a trial';
     document.getElementById('trialName').value = trial ? (trial.name||'') : '';
@@ -649,6 +689,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);}
     }
     document.getElementById('trialDialog').close();
     var req = isEdit ? apiPost({action:'update', id:id, data:data}) : apiPost({action:'add', data:data});
+    if(!isEdit && rebookFrom){ var rf = rebookFrom; rebookFrom = null; req = req.then(function(){ return apiPost({action:'update', id:rf, data:{status:'rebooked'}}); }); }
     req.then(loadTrials).catch(function(err){ console.error(err); loadTrials(); });
   });
   document.getElementById('prevWeek').addEventListener('click', function(){ weekStart = addDays(weekStart,-7); render(); });
