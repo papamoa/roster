@@ -87,6 +87,7 @@ button.ghost.small{padding:5px 12px; font-size:11.5px;}
 .chip.keen{background:#e8892a; color:#090909;}
 .chip.notKeen{background:#3a3a3a; color:#bdb8ac;}
 .chip.secondBooked{background:#3d6fa3; color:#e6f0fb;}
+.chip.classPass{background:#5b4a8a; color:#ece6ff;}
 .n2{display:inline-block; background:#090909; color:var(--gold); font-size:10px; border-radius:4px; padding:0 4px; margin-left:4px; letter-spacing:.8px;}
 .chip.keen .n2,.chip.notKeen .n2,.chip.secondBooked .n2,.chip.signedUp .n2{background:rgba(0,0,0,.35);}
 .seg{display:flex; gap:8px; margin:6px 0;}
@@ -232,7 +233,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);}
       <input type="text" id="trialClass" placeholder="Class (optional)">
       <input type="text" id="trialCoach" placeholder="Coach (optional)">
     </div>
-    <select id="trialStatus"><option value="booked">Booked</option><option value="secondBooked">Booked 2nd class</option><option value="keen">Keen, follow up</option><option value="signedUp">Signed up</option><option value="notKeen">Not keen</option><option value="noShow">No show</option></select>
+    <select id="trialStatus"><option value="booked">Booked</option><option value="secondBooked">Booked 2nd class</option><option value="keen">Keen, follow up</option><option value="signedUp">Signed up</option><option value="notKeen">Not keen</option><option value="noShow">No show</option><option value="classPass">ClassPass, no follow up</option></select>
     <textarea id="trialNotes" placeholder="Notes (optional)"></textarea>
     <textarea id="trialClassNotes" placeholder="After class notes (how they found it, goals, anything to remember)"></textarea>
     <button class="ghost" id="howWentBtn" type="button" style="width:100%; margin-top:4px;">Class done? How did it go ›</button>
@@ -257,6 +258,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);}
       <button type="button" data-o="keen">Keen, follow up</button>
       <button type="button" data-o="notKeen">Not keen</button>
       <button type="button" data-o="noShow">No show</button>
+      <button type="button" data-o="classPass">ClassPass, no follow up</button>
     </div>
     <div id="doneNext" hidden>
       <span class="lblsm">2nd class</span>
@@ -324,7 +326,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);}
     if(t.date > today) return false;
     return Date.now() >= parseDateTime(t.date, t.time||'0:0').getTime() + 45*60*1000;
   }
-  var STATUS_LABEL = {booked:'Booked', secondBooked:'Booked 2nd class', keen:'Keen, follow up', signedUp:'Signed up', notKeen:'Not keen', noShow:'No show'};
+  var STATUS_LABEL = {booked:'Booked', secondBooked:'Booked 2nd class', keen:'Keen, follow up', signedUp:'Signed up', notKeen:'Not keen', noShow:'No show', classPass:'ClassPass, no follow up'};
   function buildReminderText(t){
     var d = parseDateTime(t.date,'0:0');
     var today = todayStr(); var tomorrow = todayStr(addDays(new Date(),1));
@@ -423,7 +425,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);}
               var ds = todayStr(day);
               var cell = el('<div class="tg-cell"></div>');
               items.filter(function(t){ return (t.time||'0:0')===time && t.date===ds; }).forEach(function(t){
-                var cls = ['signedUp','noShow','keen','notKeen','secondBooked'].indexOf(t.status) > -1 ? t.status : '';
+                var cls = ['signedUp','noShow','keen','notKeen','secondBooked','classPass'].indexOf(t.status) > -1 ? t.status : '';
                 var chip = el('<button type="button" class="chip '+cls+'"></button>');
                 chip.textContent = t.name + (t.status==='noShow' ? ' (no show)' : '');
                 if(isSecond(t)) chip.appendChild(el('<span class="n2">2ND</span>'));
