@@ -236,6 +236,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);}
     <h3 id="trialDialogTitle">Book a trial</h3>
     <input type="text" id="trialName" placeholder="Name">
     <input type="text" id="trialPhone" placeholder="Phone (optional)">
+    <input type="email" id="trialEmail" placeholder="Email (optional, gets an automatic reminder)">
     <span class="lblsm">Which free class?</span>
     <div class="seg" id="trialNoSeg"><button type="button" data-n="1">1st class</button><button type="button" data-n="2">2nd class</button></div>
     <div class="field-row">
@@ -527,6 +528,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);}
     document.getElementById('trialDialogTitle').textContent = 'Rebook ' + t.name;
     document.getElementById('trialName').value = t.name || '';
     document.getElementById('trialPhone').value = t.phone || '';
+    document.getElementById('trialEmail').value = t.email || '';
     document.getElementById('trialNotes').value = t.notes || '';
     setTrialNo(isSecond(t) ? '2' : '1');
   }
@@ -624,7 +626,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);}
       var d2 = document.getElementById('doneDate').value, t2 = document.getElementById('doneTime').value;
       if(!d2 || !t2){ alert('Pick a date and time for the 2nd class.'); return; }
       reqs.push(apiPost({action:'add', data:{
-        name: t.name, phone: t.phone||'', date: d2, time: t2, className: t.className||'',
+        name: t.name, phone: t.phone||'', email: t.email||'', emailSent: false, date: d2, time: t2, className: t.className||'',
         coach: document.getElementById('doneCoach').value.trim(), status: 'booked',
         notes: notes ? 'From 1st class: '+notes : (t.notes||''), trialNo: '2', classNotes: '',
         reminderAt: computeReminderAt(d2, t2), reminderSent: false
@@ -641,6 +643,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);}
     document.getElementById('trialDialogTitle').textContent = trial ? 'Edit trial' : 'Book a trial';
     document.getElementById('trialName').value = trial ? (trial.name||'') : '';
     document.getElementById('trialPhone').value = trial ? (trial.phone||'') : '';
+    document.getElementById('trialEmail').value = trial ? (trial.email||'') : '';
     document.getElementById('trialDate').value = trial ? trial.date : (prefillDate || todayStr());
     document.getElementById('trialTime').value = trial ? (trial.time||'') : (prefillTime || '');
     document.getElementById('trialClass').value = trial ? (trial.className||'') : '';
@@ -670,6 +673,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);}
     var data = {
       name: name,
       phone: document.getElementById('trialPhone').value.trim(),
+      email: document.getElementById('trialEmail').value.trim(),
       date: date, time: time,
       className: document.getElementById('trialClass').value.trim(),
       coach: document.getElementById('trialCoach').value.trim(),
@@ -683,9 +687,11 @@ dialog::backdrop{background:rgba(0,0,0,.6);}
     var id = editingId;
     if(isEdit){
       var existing = state.trials.find(function(x){ return x.id === id; });
-      if((!existing || existing.reminderAt !== data.reminderAt) && data.reminderAt > Date.now()){ data.reminderSent = false; }
+      if((!existing || existing.reminderAt !== data.reminderAt) && data.reminderAt > Date.now()){ data.reminderSent = false; data.emailSent = false; }
+      if(existing && data.email && data.email !== (existing.email||'')){ data.emailSent = false; }
     } else {
       data.reminderSent = false;
+      data.emailSent = false;
     }
     document.getElementById('trialDialog').close();
     var req = isEdit ? apiPost({action:'update', id:id, data:data}) : apiPost({action:'add', data:data});
