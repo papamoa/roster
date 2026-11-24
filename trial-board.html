@@ -210,7 +210,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);}
 
         <div class="block">
           <h2>No <span class="accent">shows</span></h2>
-          <div class="desc">Didn't make it to their trial. Tap Rebook to put them into another class (it clears them from here), or Not interested.</div>
+          <div class="desc">Didn't make it to their trial. Tap Reschedule to move them to another day and time (it clears them from here), or Not interested.</div>
           <div id="noShowList"><div class="empty">Loading…</div></div>
         </div>
       </div>
@@ -251,6 +251,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);}
     <textarea id="trialNotes" placeholder="Notes (optional)"></textarea>
     <textarea id="trialClassNotes" placeholder="After class notes (how they found it, goals, anything to remember)"></textarea>
     <button class="ghost" id="howWentBtn" type="button" style="width:100%; margin-top:4px;">Class done? How did it go ›</button>
+    <button class="ghost" id="reschedBtn" type="button" style="width:100%; margin-top:6px;">Reschedule to another day / time ›</button>
     <div class="dialog-actions">
       <button class="danger" id="deleteTrialBtn" type="button" style="display:none;">Delete</button>
       <button class="ghost" id="cancelTrial" type="button">Cancel</button>
@@ -282,6 +283,20 @@ dialog::backdrop{background:rgba(0,0,0,.6);}
     <div class="dialog-actions">
       <button class="ghost" id="doneCancel" type="button">Cancel</button>
       <button class="primary" id="doneSave" type="button">Save</button>
+    </div>
+  </div>
+</dialog>
+
+<dialog id="reschedDialog">
+  <div class="dialog-inner">
+    <h3>Reschedule trial</h3>
+    <div id="reschedWho" style="color:var(--muted); font-size:13.5px; margin-bottom:6px;"></div>
+    <span class="lblsm">New day and time</span>
+    <div class="field-row"><input type="date" id="reschedDate"><input type="time" id="reschedTime"></div>
+    <input type="text" id="reschedCoach" placeholder="Coach (optional)">
+    <div class="dialog-actions">
+      <button class="ghost" id="reschedCancel" type="button">Cancel</button>
+      <button class="primary" id="reschedSave" type="button">Reschedule</button>
     </div>
   </div>
 </dialog>
@@ -464,7 +479,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);}
       renderList('followupList',
         state.trials.filter(function(t){ return t.status === 'booked' && classOver(t); }).sort(byNewest),
         'Nothing waiting. Trials land here once their class has finished.',
-        function(t){ return [['How did it go?', true, function(){ openDone(t); }]]; },
+        function(t){ return [['How did it go?', true, function(){ openDone(t); }], ['Reschedule', false, function(){ openResched(t); }]]; },
         function(t){ openDone(t); });
       renderList('keenList',
         state.trials.filter(function(t){ return t.status === 'keen'; }).sort(byNewest),
@@ -478,7 +493,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);}
         state.trials.filter(function(t){ return t.status === 'noShow'; }).sort(byNewest),
         'No no-shows to chase.',
         function(t){ return [
-          ['Rebook', true, function(){ rebook(t); }],
+          ['Reschedule', true, function(){ openResched(t); }],
           ['Not interested', false, function(){ quickUpdate(t.id, {status:'notKeen'}); }]
         ]; },
         function(t){ openDialog(t); });
@@ -588,6 +603,35 @@ dialog::backdrop{background:rgba(0,0,0,.6);}
     });
   });
 
+  var reschedTrial = null;
+  function openResched(t){
+    reschedTrial = t;
+    document.getElementById('reschedWho').textContent = t.name + (isSecond(t) ? ' (2nd class)' : '') + ' · currently ' + dayLabel(t.date) + ' · ' + formatTime(t.time||'');
+    document.getElementById('reschedDate').value = t.date || todayStr();
+    document.getElementById('reschedTime').value = t.time || '';
+    document.getElementById('reschedCoach').value = t.coach || '';
+    document.getElementById('reschedDialog').showModal();
+  }
+  document.getElementById('reschedBtn').addEventListener('click', function(){
+    var t = state.trials.find(function(x){ return x.id === editingId; });
+    document.getElementById('trialDialog').close();
+    if(t) openResched(t);
+  });
+  document.getElementById('reschedCancel').addEventListener('click', function(){ document.getElementById('reschedDialog').close(); });
+  document.getElementById('reschedSave').addEventListener('click', function(){
+    if(!reschedTrial) return;
+    var d = document.getElementById('reschedDate').value, tm = document.getElementById('reschedTime').value;
+    if(!d || !tm){ alert('Pick the new date and time.'); return; }
+    var t = reschedTrial;
+    var note = 'Rescheduled from ' + dayLabel(t.date) + ' ' + formatTime(t.time||'');
+    var data = { date: d, time: tm, coach: document.getElementById('reschedCoach').value.trim(), status: 'booked',
+      reminderAt: computeReminderAt(d, tm), reminderSent: false, emailSent: false,
+      notes: (t.notes ? t.notes + ' · ' : '') + note };
+    document.getElementById('reschedDialog').close();
+    weekStart = mondayOf(parseDateTime(d, '0:0'));
+    apiPost({action:'update', id:t.id, data:data}).then(loadTrials).catch(function(err){ console.error(err); loadTrials(); });
+  });
+
   var trialNo = '1';
   function setTrialNo(n){ trialNo = n; document.querySelectorAll('#trialNoSeg button').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-n')===n); }); }
   document.querySelectorAll('#trialNoSeg button').forEach(function(b){ b.addEventListener('click', function(){ setTrialNo(b.getAttribute('data-n')); }); });
@@ -653,6 +697,7 @@ dialog::backdrop{background:rgba(0,0,0,.6);}
     document.getElementById('trialClassNotes').value = trial ? (trial.classNotes||'') : '';
     setTrialNo(trial && isSecond(trial) ? '2' : '1');
     document.getElementById('howWentBtn').style.display = trial ? '' : 'none';
+    document.getElementById('reschedBtn').style.display = trial ? '' : 'none';
     document.getElementById('deleteTrialBtn').style.display = trial ? '' : 'none';
     document.getElementById('trialDialog').showModal();
   }
